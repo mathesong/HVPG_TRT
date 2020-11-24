@@ -1,16 +1,3 @@
----
-output:
-  html_document:
-    df_print: paged
-    keep_md: yes
-    toc: true
-    toc_float:
-      toc_collapsed: true
-  pdf_document:
-    toc: true
-title: "HVPG TRT and Power Analysis"
----
-
 # Aims
 
 Here, I will analyse the HVPG dataset, evaluate aspects of its test-retest reliability, and perform a power analysis for comparing treatments.
