@@ -115,12 +115,6 @@ trt_all <- trt_tidy %>%
 trt_all
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["decomp"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["cv"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["icc"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["icc_l"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["icc_u"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["wscv"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["sdd"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["absvar"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["signvar"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["signvar_sd"],"name":[14],"type":["dbl"],"align":["right"]}],"data":[{"1":"Includes Decompensated","2":"17.79008","3":"4.856742","4":"0.2730029","5":"0.0455884","6":"-0.4937445","7":"0.8225684","8":"0.7699635","9":"0.8640907","10":"0.11517756","11":"5.679483","12":"0.12032447","13":"-0.0034327398","14":"0.1634746"},{"1":"Only Compensated","2":"16.19833","3":"3.953936","4":"0.2440952","5":"0.3764225","6":"-0.5408748","7":"0.8721779","8":"0.8358338","9":"0.9009234","10":"0.08739701","11":"3.924009","12":"0.09579193","13":"0.0002057825","14":"0.1240119"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-
 ```r
 kable(trt_all, digits=2)
 ```
@@ -380,12 +374,6 @@ overall <- trt_all %>%
 
 overall
 ```
-
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Study"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["cv"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["icc"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["icc_l"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["icc_u"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["wscv"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["sdd"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["absvar"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["signvar"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["signvar_sd"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["sdd_l"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["sdd_u"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["sddm"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["sddm_l"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["sddm_u"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["decomp"],"name":[20],"type":["chr"],"align":["left"]},{"label":["Catheter"],"name":[21],"type":["chr"],"align":["left"]},{"label":["n"],"name":[22],"type":["dbl"],"align":["right"]}],"data":[{"1":"Only Compensated","2":"16.19833","3":"3.953936","4":"0.2440952","5":"0.3764225","6":"-0.5408748","7":"0.8721779","8":"0.8358338","9":"0.9009234","10":"0.08739701","11":"3.924009","12":"0.09579193","13":"0.0002057825","14":"0.1240119","15":"3.525756","16":"4.424489","17":"24.22477","18":"21.51506","19":"27.31478","20":"Overall","21":"Balloon tip","22":"300"},{"1":"Includes Decompensated*","2":"17.79008","3":"4.856742","4":"0.2730029","5":"0.0455884","6":"-0.4937445","7":"0.8225684","8":"0.7699635","9":"0.8640907","10":"0.11517756","11":"5.679483","12":"0.12032447","13":"-0.0034327398","14":"0.1634746","15":"5.067141","16":"6.461497","17":"31.92501","18":"28.08643","19":"36.36064","20":"Overall","21":"Balloon tip","22":"262"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
 
 
 
@@ -1848,12 +1836,6 @@ And let's get some values for that too
 psych::describe(trt_wide$abschange)
 ```
 
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["vars"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["trimmed"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["min"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["max"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["range"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"281","3":"1.741993","4":"1.740838","5":"1","6":"1.495556","7":"1.4826","8":"0","9":"13.5","10":"13.5","11":"2.144075","12":"8.365256","13":"0.1038497","_rn_":"X1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-
 ```r
 psych::describeBy(trt_wide$abschange, group=trt_wide$decomp)
 ```
@@ -1986,12 +1968,6 @@ And some values
 ```r
 psych::describe(trt_wide$change)
 ```
-
-<div data-pagedtable="false">
-  <script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["vars"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["trimmed"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["min"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["max"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["range"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"281","3":"-0.02669039","4":"2.464788","5":"0","6":"0.03111111","7":"1.4826","8":"-13.5","9":"9","10":"22.5","11":"-0.5577071","12":"3.67794","13":"0.1470369","_rn_":"X1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
 
 ```r
 psych::describeBy(trt_wide$change, group=trt_wide$decomp)
