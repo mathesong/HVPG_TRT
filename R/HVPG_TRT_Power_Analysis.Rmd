@@ -8,6 +8,7 @@ output:
       toc_collapsed: true
   pdf_document:
     toc: true
+    keep_tex: true
 title: "HVPG TRT and Power Analysis"
 ---
 
@@ -124,6 +125,24 @@ trt_all
 
 kable(trt_all, digits=2)
 ```
+
+I'll also create a tidy version of this to complement the individual studies.
+
+```{r}
+trt_all_tidy <- trt_all %>% 
+  mutate(signvar_sd = signvar_sd * mean) %>% 
+  ungroup() %>% 
+  select(Patients = decomp, 
+         Mean = mean, CV = cv, 
+         WSCV = wscv, ICC = icc,
+         SDD = sdd,
+         "Change SD" = signvar_sd) %>% 
+  arrange(desc(Patients))
+
+kable(trt_all_tidy, digits=2)
+```
+
+
 
 So, overall, we estimate that our smallest detectable difference in an individual is `r round(trt_all$sdd, 1)[2]`mmHg for only compensated patients, and `r round(trt_all$sdd, 1)[1]`mmHg for studies including decompensated patients
 
@@ -252,7 +271,7 @@ tidytrt_kable <- knitr::kable(tidytrt_table[,-1], digits=2) %>%
 
 tidytrt_kable
 
-save_kable(tidytrt_kable, file = "figures/tidytrt_kable.jpg")
+# save_kable(tidytrt_kable, file = "figures/tidytrt_kable.jpg")
 ```
 
 
@@ -565,8 +584,8 @@ bootstrap_sdd <- function(n, data, colname=NULL) {
   return(out)
 }
 
-bootstrap_sdd_single(trt_compare$data[[1]])
-bootstrap_sdd(100, trt_compare$data[[1]], "test")
+# bootstrap_sdd_single(trt_compare$data[[1]])
+# bootstrap_sdd(100, trt_compare$data[[1]], "test")
 ```
 
 And now we test
@@ -631,8 +650,8 @@ bootstrap_sddm <- function(n, data, colname=NULL) {
   return(out)
 }
 
-bootstrap_sddm_single(trt_compare$data[[1]])
-bootstrap_sddm(100, trt_compare$data[[1]], "test")
+# bootstrap_sddm_single(trt_compare$data[[1]])
+# bootstrap_sddm(100, trt_compare$data[[1]], "test")
 ```
 
 And now we test
@@ -798,6 +817,8 @@ abs_change_distr
 ```{r, warning=FALSE}
 permTREND(formula=abschange ~ Perc_Decomp, data=trt_wide,
           method="exact.mc")
+
+permuco::lmperm(abschange ~ Perc_Decomp, data=trt_wide)
 ```
 
 
@@ -1264,6 +1285,13 @@ knitr::kable(measured_percs_summary[,-1]) %>%
   kable_styling("striped", full_width = F) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(measured_percs_summary))
+
+appchange <- knitr::kable(measured_percs_summary[,-1]) %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
+  pack_rows(trt_all$decomp[2], decomp_change, nrow(measured_percs_summary))
+
+save_kable(appchange, file = "figures/appchange.jpg")
 ```
 
 So, for a true effect of about 2mmHg in compensated patients, it will appear as if 12-16% would appear to worsen.  This fits with clinical experience.
@@ -1472,7 +1500,7 @@ kable(difsims_power[,-1]) %>%
 
 ## Analytical solution
 
-Let's just check these with the analytical solution
+Let's compare these with the analytical solution
 
 * Decomp
 * Homogeneous
@@ -1551,6 +1579,13 @@ kable(difsims_power_ana[,-1]) %>%
   kable_styling("striped", full_width = F) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_power_ana))
+
+difpower <- kable(difsims_power_ana[,-1]) %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
+  pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_power_ana))
+
+save_kable(difpower, "figures/difpower.jpg")
 ```
 
 
@@ -1926,6 +1961,25 @@ kable(difindifsims_power[,-1]) %>%
   kable_styling("striped", full_width = F) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(difindifsims_power))
+
+difindiftable_decomp <- difindifsims_power %>% 
+  filter(Patients=="Includes Decompensated") %>% 
+  ungroup() %>% 
+  select(-Patients) %>% 
+  kable() %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows("Includes Decompensated", 1, decomp_change-1) 
+
+difindiftable_comp <- difindifsims_power %>% 
+  filter(Patients=="Only Compensated") %>% 
+  ungroup() %>% 
+  select(-Patients) %>% 
+  kable() %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows("Only Compensated", 1, decomp_change-1)
+
+save_kable(difindiftable_decomp, "figures/difindifpower_dc.jpg")
+save_kable(difindiftable_comp, "figures/difindifpower_c.jpg")
 ```
 
 

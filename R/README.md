@@ -180,6 +180,59 @@ kable(trt_all, digits=2)
 </tbody>
 </table>
 
+I'll also create a tidy version of this to complement the individual studies.
+
+
+```r
+trt_all_tidy <- trt_all %>% 
+  mutate(signvar_sd = signvar_sd * mean) %>% 
+  ungroup() %>% 
+  select(Patients = decomp, 
+         Mean = mean, CV = cv, 
+         WSCV = wscv, ICC = icc,
+         SDD = sdd,
+         "Change SD" = signvar_sd) %>% 
+  arrange(desc(Patients))
+
+kable(trt_all_tidy, digits=2)
+```
+
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Patients </th>
+   <th style="text-align:right;"> Mean </th>
+   <th style="text-align:right;"> CV </th>
+   <th style="text-align:right;"> WSCV </th>
+   <th style="text-align:right;"> ICC </th>
+   <th style="text-align:right;"> SDD </th>
+   <th style="text-align:right;"> Change SD </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Only Compensated </td>
+   <td style="text-align:right;"> 16.20 </td>
+   <td style="text-align:right;"> 0.24 </td>
+   <td style="text-align:right;"> 0.09 </td>
+   <td style="text-align:right;"> 0.87 </td>
+   <td style="text-align:right;"> 3.92 </td>
+   <td style="text-align:right;"> 2.01 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Includes Decompensated </td>
+   <td style="text-align:right;"> 17.79 </td>
+   <td style="text-align:right;"> 0.27 </td>
+   <td style="text-align:right;"> 0.12 </td>
+   <td style="text-align:right;"> 0.82 </td>
+   <td style="text-align:right;"> 5.68 </td>
+   <td style="text-align:right;"> 2.91 </td>
+  </tr>
+</tbody>
+</table>
+
+
+
 So, overall, we estimate that our smallest detectable difference in an individual is 3.9mmHg for only compensated patients, and 5.7mmHg for studies including decompensated patients
 
 
@@ -1265,7 +1318,7 @@ tidytrt_kable
 </table>
 
 ```r
-save_kable(tidytrt_kable, file = "figures/tidytrt_kable.jpg")
+# save_kable(tidytrt_kable, file = "figures/tidytrt_kable.jpg")
 ```
 
 
@@ -1557,7 +1610,7 @@ quantile(trt_compare_icc$dif, c(0.025, 0.975)) # 95% CI
 
 ```
 ##        2.5%       97.5% 
-## -0.02794468  0.14634069
+## -0.02753327  0.15045890
 ```
 
 ```r
@@ -1612,8 +1665,10 @@ bootstrap_sdd <- function(n, data, colname=NULL) {
   
   return(out)
 }
-```
 
+# bootstrap_sdd_single(trt_compare$data[[1]])
+# bootstrap_sdd(100, trt_compare$data[[1]], "test")
+```
 
 And now we test
 
@@ -1635,8 +1690,8 @@ quantile(trt_compare_sdd$dif, c(0.025, 0.975)) # 95% CI
 ```
 
 ```
-##     2.5%    97.5% 
-## 0.574844 3.019354
+##      2.5%     97.5% 
+## 0.4762817 2.9445073
 ```
 
 ```r
@@ -1644,7 +1699,7 @@ quantile(trt_compare_sdd$dif, c(0.025, 0.975)) # 95% CI
 ```
 
 ```
-## [1] 0.003
+## [1] 0.002
 ```
 
 ### SDDM
@@ -1691,8 +1746,10 @@ bootstrap_sddm <- function(n, data, colname=NULL) {
   
   return(out)
 }
-```
 
+# bootstrap_sddm_single(trt_compare$data[[1]])
+# bootstrap_sddm(100, trt_compare$data[[1]], "test")
+```
 
 And now we test
 
@@ -1715,7 +1772,7 @@ quantile(trt_compare_sddm$dif, c(0.025, 0.975)) # 95% CI
 
 ```
 ##        2.5%       97.5% 
-## 0.005952583 0.148503260
+## 0.003998717 0.149962352
 ```
 
 ```r
@@ -1723,7 +1780,7 @@ quantile(trt_compare_sddm$dif, c(0.025, 0.975)) # 95% CI
 ```
 
 ```
-## [1] 0.014
+## [1] 0.02
 ```
 
 
@@ -1771,7 +1828,7 @@ ggplot(trt_wide, aes(x=abschange)) +
   geom_density(fill="black",alpha=0.5)
 ```
 
-![](figures/unnamed-chunk-21-1.png)<!-- -->
+![](figures/unnamed-chunk-22-1.png)<!-- -->
 And between groups
 
 
@@ -1782,7 +1839,7 @@ ggplot(trt_wide, aes(x=abschange)) +
   theme(legend.position="bottom")
 ```
 
-![](figures/unnamed-chunk-22-1.png)<!-- -->
+![](figures/unnamed-chunk-23-1.png)<!-- -->
 
 And let's get some values for that too
 
@@ -1824,7 +1881,7 @@ ggplot(trt_wide, aes(x=change)) +
   geom_density(fill="black",alpha=0.5)
 ```
 
-![](figures/unnamed-chunk-24-1.png)<!-- -->
+![](figures/unnamed-chunk-25-1.png)<!-- -->
 ... and by group
 
 
@@ -1835,7 +1892,7 @@ ggplot(trt_wide, aes(x=change)) +
   theme(legend.position="bottom")
 ```
 
-![](figures/unnamed-chunk-25-1.png)<!-- -->
+![](figures/unnamed-chunk-26-1.png)<!-- -->
 
 For signed differences, let's assess whether they differ from zero.
 
@@ -1975,7 +2032,7 @@ sign_change_distr <- trt_wide %>%
 sign_change_distr
 ```
 
-![](figures/unnamed-chunk-28-1.png)<!-- -->
+![](figures/unnamed-chunk-29-1.png)<!-- -->
 
 ```r
 abs_change_distr <- trt_wide %>% 
@@ -1994,7 +2051,7 @@ abs_change_distr <- trt_wide %>%
 abs_change_distr
 ```
 
-![](figures/unnamed-chunk-28-2.png)<!-- -->
+![](figures/unnamed-chunk-29-2.png)<!-- -->
 
 
 
@@ -2028,6 +2085,21 @@ permTREND(formula=abschange ~ Perc_Decomp, data=trt_wide,
 ##  0.00000000 0.01057916
 ```
 
+```r
+permuco::lmperm(abschange ~ Perc_Decomp, data=trt_wide)
+```
+
+```
+## Table of marginal t-test of the betas
+## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
+## (Intercept) 1.457111   0.139469  10.448           8.842e-22                   
+## Perc_Decomp 0.006508   0.002164   3.008           2.868e-03             0.9992
+##             permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)                                        
+## Perc_Decomp              0.001               0.0022
+```
+
 
 
 ```r
@@ -2043,7 +2115,7 @@ decomp_plot <- ggplot(trt_wide, aes(x=Perc_Decomp, y=abschange)) +
 decomp_plot
 ```
 
-![](figures/unnamed-chunk-30-1.png)<!-- -->
+![](figures/unnamed-chunk-31-1.png)<!-- -->
 
 
 ## Days elapsed
@@ -2062,8 +2134,8 @@ permuco::lmperm(abschange ~ Days + Perc_Decomp, data=trt_wide)
 ## Perc_Decomp  0.0060002   0.002299  2.6104           9.535e-03
 ##             permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
 ## (Intercept)                                                           
-## Days                    0.2686             0.7316               0.5006
-## Perc_Decomp             0.9974             0.0028               0.0080
+## Days                    0.2628             0.7374               0.5092
+## Perc_Decomp             0.9964             0.0038               0.0082
 ```
 
 Now let's plot, after correcting for the effect of the patient groups.
@@ -2098,7 +2170,7 @@ days_plot <- trt_wide %>%
 days_plot
 ```
 
-![](figures/unnamed-chunk-32-1.png)<!-- -->
+![](figures/unnamed-chunk-33-1.png)<!-- -->
 
 ## Percentage Alcoholic
 
@@ -2176,7 +2248,7 @@ perc_alc_plot <- trt_wide %>%
 perc_alc_plot
 ```
 
-![](figures/unnamed-chunk-34-1.png)<!-- -->
+![](figures/unnamed-chunk-35-1.png)<!-- -->
 
 ## Multicentre
 
@@ -2211,7 +2283,7 @@ centre_plot <- trt_wide %>%
 centre_plot
 ```
 
-![](figures/unnamed-chunk-36-1.png)<!-- -->
+![](figures/unnamed-chunk-37-1.png)<!-- -->
 
 
 
@@ -2293,7 +2365,7 @@ meanv_abs_plot <- trt_wide %>%
 meanv_abs_plot
 ```
 
-![](figures/unnamed-chunk-38-1.png)<!-- -->
+![](figures/unnamed-chunk-39-1.png)<!-- -->
 
 
 ### Signed
@@ -2471,7 +2543,7 @@ meanv_signed_plot <- trt_wide %>%
 meanv_signed_plot
 ```
 
-![](figures/unnamed-chunk-40-1.png)<!-- -->
+![](figures/unnamed-chunk-41-1.png)<!-- -->
 
 
 
@@ -2486,7 +2558,7 @@ meanv_signed_plot_nocorr <- ggplot(data=trt_wide, aes(x=meanval, y=change)) +
 meanv_signed_plot_nocorr
 ```
 
-![](figures/unnamed-chunk-41-1.png)<!-- -->
+![](figures/unnamed-chunk-42-1.png)<!-- -->
 
 
 
@@ -2500,7 +2572,7 @@ cowplot::plot_grid(decomp_plot, days_plot,
                    ncol = 2, labels = "AUTO")
 ```
 
-![](figures/unnamed-chunk-42-1.png)<!-- -->
+![](figures/unnamed-chunk-43-1.png)<!-- -->
 
 
 ```r
@@ -2510,7 +2582,7 @@ cowplot::plot_grid(abs_change_distr, sign_change_distr,
                    ncol = 2, labels = "AUTO")
 ```
 
-![](figures/unnamed-chunk-43-1.png)<!-- -->
+![](figures/unnamed-chunk-44-1.png)<!-- -->
 
 
 
@@ -2617,7 +2689,7 @@ ggplot(effects, aes(x=PrePost, y=Outcome, colour=ID, group=ID)) +
   guides(colour=FALSE)
 ```
 
-![](figures/unnamed-chunk-44-1.png)<!-- -->
+![](figures/unnamed-chunk-45-1.png)<!-- -->
 
 So, to summarise, we have underlying true values, and measured values after accounting for measurement error.  The change from before to after the intervention can either be homogeneous (everyone has exactly the same effect), or heterogeneous (effect sizes differ, and some even get harmed by the intervention - about 2.5% as I've chosen the SD of the intervention effect as 50% of the mean effect, so 0 effect is 2 SDs away from the mean effect size, which is approximately 2.5%).  Then, the measured values appear to show more people getting worse after treatment, but this is just due to measurement error.
 
@@ -2659,7 +2731,7 @@ ggplot(heterogen_effects, aes(x=Effect)) +
                        "worsening."))
 ```
 
-![](figures/unnamed-chunk-45-1.png)<!-- -->
+![](figures/unnamed-chunk-46-1.png)<!-- -->
 
 This would imply that for all different sizes of effect, that only 2.3% experience a true worsening. However, when we measure the values, there are also several individuals who will exhibit an apparent worsening (increases from first to second measurement), when their true underlying values exhibited improvements. Let's calculate what fraction of individuals this would be.
 
@@ -3084,6 +3156,15 @@ knitr::kable(measured_percs_summary[,-1]) %>%
 </tbody>
 </table>
 
+```r
+appchange <- knitr::kable(measured_percs_summary[,-1]) %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
+  pack_rows(trt_all$decomp[2], decomp_change, nrow(measured_percs_summary))
+
+save_kable(appchange, file = "figures/appchange.jpg")
+```
+
 So, for a true effect of about 2mmHg in compensated patients, it will appear as if 12-16% would appear to worsen.  This fits with clinical experience.
 
 
@@ -3253,7 +3334,7 @@ ggplot(difsims_res, aes(x=n, y=power, colour=delta)) +
        colour="Intervention\nEffect (mmHg)")
 ```
 
-![](figures/unnamed-chunk-53-1.png)<!-- -->
+![](figures/unnamed-chunk-54-1.png)<!-- -->
 
 ## Required Individuals
 
@@ -3434,7 +3515,7 @@ kable(difsims_power[,-1]) %>%
 
 ## Analytical solution
 
-Let's just check these with the analytical solution
+Let's compare these with the analytical solution
 
 * Decomp
 * Homogeneous
@@ -3679,6 +3760,15 @@ kable(difsims_power_ana[,-1]) %>%
 </tbody>
 </table>
 
+```r
+difpower <- kable(difsims_power_ana[,-1]) %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
+  pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_power_ana))
+
+save_kable(difpower, "figures/difpower.jpg")
+```
+
 
 ### Contour Plots
 
@@ -3774,13 +3864,13 @@ hetplot <- ggplot(contour_het, aes(x=n, y=Difference, z=Power)) +
 homplot
 ```
 
-![](figures/unnamed-chunk-60-1.png)<!-- -->
+![](figures/unnamed-chunk-61-1.png)<!-- -->
 
 ```r
 hetplot
 ```
 
-![](figures/unnamed-chunk-60-2.png)<!-- -->
+![](figures/unnamed-chunk-61-2.png)<!-- -->
 
 ```r
 ggsave(homplot, height=5, width=10, filename = "figures/Dif_hom_contour.png")
@@ -4019,7 +4109,7 @@ difindifplot <- cowplot::plot_grid(
 difindifplot
 ```
 
-![](figures/unnamed-chunk-66-1.png)<!-- -->
+![](figures/unnamed-chunk-67-1.png)<!-- -->
 
 ## Required Individuals
 
@@ -4567,6 +4657,27 @@ kable(difindifsims_power[,-1]) %>%
 </tbody>
 </table>
 
+```r
+difindiftable_decomp <- difindifsims_power %>% 
+  filter(Patients=="Includes Decompensated") %>% 
+  ungroup() %>% 
+  select(-Patients) %>% 
+  kable() %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows("Includes Decompensated", 1, decomp_change-1) 
+
+difindiftable_comp <- difindifsims_power %>% 
+  filter(Patients=="Only Compensated") %>% 
+  ungroup() %>% 
+  select(-Patients) %>% 
+  kable() %>% 
+  kable_styling("striped", full_width = F) %>%
+  pack_rows("Only Compensated", 1, decomp_change-1)
+
+save_kable(difindiftable_decomp, "figures/difindifpower_dc.jpg")
+save_kable(difindiftable_comp, "figures/difindifpower_c.jpg")
+```
+
 
 
 ## Contour Plot
@@ -4605,7 +4716,7 @@ difindif_cont1_hom <- difindifsims_res_hom %>%
 difindif_cont1_hom
 ```
 
-![](figures/unnamed-chunk-68-1.png)<!-- -->
+![](figures/unnamed-chunk-69-1.png)<!-- -->
 
 ```r
 difindif_cont1_het <- difindifsims_res_het %>% 
@@ -4624,7 +4735,7 @@ difindif_cont1_het <- difindifsims_res_het %>%
 difindif_cont1_het
 ```
 
-![](figures/unnamed-chunk-68-2.png)<!-- -->
+![](figures/unnamed-chunk-69-2.png)<!-- -->
 This is helpful to visualise, though probably not for the paper. With homogeneous effects, the determinant of the power is the difference in intervention effects; it's a straight line. With heterogeneous effects, the line is not straight
 
 
@@ -4644,7 +4755,7 @@ difindif_cont2_hom <- ggplot(difindifsims_res_hom, aes(x=n, y=delta1, z=power)) 
 difindif_cont2_hom
 ```
 
-![](figures/unnamed-chunk-69-1.png)<!-- -->
+![](figures/unnamed-chunk-70-1.png)<!-- -->
 
 ```r
 difindif_cont2_het <- ggplot(difindifsims_res_het, aes(x=n, y=delta1, z=power)) +
@@ -4661,7 +4772,7 @@ difindif_cont2_het <- ggplot(difindifsims_res_het, aes(x=n, y=delta1, z=power)) 
 difindif_cont2_het
 ```
 
-![](figures/unnamed-chunk-69-2.png)<!-- -->
+![](figures/unnamed-chunk-70-2.png)<!-- -->
 
 And just looking against placebo (i.e. delta2=0)
 
@@ -4684,7 +4795,7 @@ difindif_cont3_hom <- difindifsims_res_hom %>%
 difindif_cont3_hom
 ```
 
-![](figures/unnamed-chunk-70-1.png)<!-- -->
+![](figures/unnamed-chunk-71-1.png)<!-- -->
 
 ```r
 difindif_cont3_het <- difindifsims_res_het %>% 
@@ -4704,7 +4815,7 @@ difindif_cont3_het <- difindifsims_res_het %>%
 difindif_cont3_het
 ```
 
-![](figures/unnamed-chunk-70-2.png)<!-- -->
+![](figures/unnamed-chunk-71-2.png)<!-- -->
 
 ```r
 ggsave(difindif_cont3_hom, height=5, width=10, filename = "figures/Difindif_hom_contour.png")
