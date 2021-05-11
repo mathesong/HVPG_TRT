@@ -1,0 +1,10 @@
+name: hvpg_power
+title:
+username:
+account: mathesong
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4110796
+bundleId: 4583140
+url: https://mathesong.shinyapps.io/hvpg_power/
+when: 1620683866.72104

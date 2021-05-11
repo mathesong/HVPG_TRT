@@ -1,15 +1,18 @@
 ---
+title: "HVPG TRT and Power Analysis"
 output:
+  pdf_document:
+    toc: yes
+    keep_tex: yes
   html_document:
     df_print: paged
     keep_md: yes
-    toc: true
+    always_allow_html: true
+    toc: yes
     toc_float:
-      toc_collapsed: true
-  pdf_document:
-    toc: true
-    keep_tex: true
-title: "HVPG TRT and Power Analysis"
+      toc_collapsed: yes
+  word_document:
+    toc: yes
 ---
 
 # Aims
@@ -37,6 +40,8 @@ library(perm)
 library(ggbeeswarm)
 library(psych)
 library(permuco)
+library(metafor)
+library(viridis)
 
 extrafont::loadfonts(quiet = T)
 
@@ -122,6 +127,8 @@ trt_all <- trt_tidy %>%
   
 
 trt_all
+
+saveRDS(trt_all, "../Cluster/trt_all.rds")
 
 kable(trt_all, digits=2)
 ```
@@ -314,6 +321,19 @@ ICCs <- ggplot(icc_out,aes(x=icc,y=Study,
 ICCs + theme(legend.position = "none")
 ```
 
+This analysis constitutes a mega-analysis: we have all the original data and the overall estimates are performed using the original data estimates. However, in order to asess the study heterogeneity, I will run a classical meta-analysis. I will perform a Fisher's z transformation on the ICC values, perform a classic meta-analysis, and assess the heterogeneity.
+
+
+```{r}
+dat <- icc_out %>% 
+  filter(Study != "Spahr 2007") %>% 
+  filter(decomp != "Overall") %>% 
+  filter(n > 4) %>% 
+  escalc(measure="ZCOR", ri=icc, ni=n, data=., slab=Study) 
+
+res <- rma(yi, vi, data=dat) 
+res 
+```
 
 ### SDD
 
@@ -358,6 +378,34 @@ SDDs <- ggplot(sdd_out,aes(x=sdd,y=Study,
 SDDs  #+ annotate("rect", xmin = 0.75, xmax = 1, ymin="Spahr 2007", ymax="Blei 1987", alpha = .2, fill="grey")
 ```
 
+And here we run the meta-analysis again to assess heterogeneity.  We can't use the SDD because it has asymmetric confidence intervals, and it cannot be Fisher's z transformed.  So we can run a meta-analysis based on the average absolute variation to test the heterogeneity.
+
+
+```{r}
+dat <- trt_study %>% 
+  mutate(
+    mean_abs_var = map_dbl(outcomes, ~mean(sqrt(.x$absvars))),
+    se_abs_var = map_dbl(outcomes, ~sd(sqrt(.x$absvars)) / sqrt(length(.x$absvars)))
+  ) %>% 
+  filter(New_Description != "Spahr 2007") %>% 
+  ungroup() %>% 
+  mutate(
+    yi = mean_abs_var,
+    vi = se_abs_var^2) %>% 
+  select(-data, -outcomes) %>% 
+  escalc(measure="MN", yi=yi, vi=vi, ni=n, data=., slab=New_Description) 
+
+transf.sqrt <- function (xi, ...) 
+{
+    zi <- sqrt(xi)
+    zi[xi < 0] <- 0
+    return(c(zi))
+}
+
+res <- rma(yi, vi, data=dat)
+res 
+```
+
 
 #### Percentage
 
@@ -399,6 +447,26 @@ SDDms <- ggplot(sddm_out,aes(x=sddm,y=Study,
   NULL
 
 SDDms  #+ annotate("rect", xmin = 0.75, xmax = 1, ymin="Spahr 2007", ymax="Blei 1987", alpha = .2, fill="grey")
+```
+
+And here we run the meta-analysis to assess heterogeneity.  We can't use the SDD% because it has asymmetric confidence intervals, and it cannot be Fisher's z transformed.  So we can run a meta-analysis based on the average absolute percentage variation to test the heterogeneity.
+
+
+```{r}
+dat <- trt_study %>% 
+  mutate(
+    mean_abs_var = map_dbl(outcomes, ~mean(sqrt(.x$absvars / .x$means))),
+    se_abs_var = map_dbl(outcomes, ~sd(sqrt(.x$absvars / .x$means)) / 
+                           sqrt(length(.x$absvars)))
+  ) %>% 
+  filter(New_Description != "Spahr 2007") %>% 
+  ungroup() %>% 
+  mutate(
+    yi = mean_abs_var,
+    vi = se_abs_var^2)
+
+res <- rma(yi, vi, data=dat) 
+res 
 ```
 
 
@@ -522,11 +590,10 @@ bootstrap_icc <- function(n, data, colname=NULL) {
 ```
 
 
-That seems to work. Now let's test it!
 
 ```{r}
 trt_compare_iccvals <- trt_compare %>% 
-  mutate(boot = map2(data, decomp, ~bootstrap_icc(1000, .x))) %>% 
+  mutate(boot = map2(data, decomp, ~bootstrap_icc(10000, .x))) %>% 
   select(-data) %>% 
   unnest(boot)
 ```
@@ -536,8 +603,8 @@ trt_compare_icc <- trt_compare_iccvals %>%
   spread(decomp, boot_icc) %>% 
   mutate(dif = `Only Compensated` - `Includes Decompensated`)
 
-quantile(trt_compare_icc$dif, c(0.025, 0.975)) # 95% CI
-1-sum(trt_compare_icc$dif > 0)/1000 # one-sided p value
+quantile(trt_compare_icc$dif, c(0.025, 0.5, 0.975)) # 95% CI
+1-sum(trt_compare_icc$dif > 0)/10000 # one-sided p value
 ```
 
 Not significant
@@ -546,6 +613,31 @@ Not significant
 
 
 ```{r}
+bootstrap_sdd_single <- function(data) {
+  
+  sample_ids <- unique(data$`Serial number`)
+  ids <- sample(sample_ids, length(sample_ids), replace=TRUE)
+  
+  data_nested <- data %>% 
+    select(`Serial number`, MEASUREMENT, PP) %>% 
+    nest_by(`Serial number`)
+  
+  boot_sample <- tibble(
+    `Serial number` = ids
+  ) %>% 
+    left_join(data_nested, by="Serial number") %>% 
+    select(-`Serial number`) %>% 
+    mutate(boot_serial = 1:n()) %>% 
+    unnest(data) %>% 
+    relfeas::trt_widify("PP", "boot_serial", "MEASUREMENT")
+
+  boot_sdd <- suppressMessages(
+    suppressWarnings(
+      agRee::agree.sdd(as.matrix(boot_sample[,c(2,3)]))$value ) )
+  return(boot_sdd)
+}
+
+
 bootstrap_sdd_single <- function(data) {
   
   sample_ids <- unique(data$`Serial number`)
@@ -592,7 +684,7 @@ And now we test
 
 ```{r}
 trt_compare_sddvals <- trt_compare %>% 
-  mutate(boot = map2(data, decomp, ~bootstrap_sdd(1000, .x))) %>% 
+  mutate(boot = map2(data, decomp, ~bootstrap_sdd(10000, .x))) %>% 
   select(-data) %>% 
   unnest(boot)
 ```
@@ -602,8 +694,8 @@ trt_compare_sdd <- trt_compare_sddvals %>%
   spread(decomp, boot_sdd) %>% 
   mutate(dif = `Includes Decompensated` - `Only Compensated`)
 
-quantile(trt_compare_sdd$dif, c(0.025, 0.975)) # 95% CI
-1-sum(trt_compare_sdd$dif > 0)/1000 # one-sided p value
+quantile(trt_compare_sdd$dif, c(0.025, 0.5, 0.975)) # 95% CI
+1-sum(trt_compare_sdd$dif > 0)/10000 # one-sided p value
 ```
 
 ### SDDM
@@ -658,7 +750,7 @@ And now we test
 
 ```{r}
 trt_compare_sddmvals <- trt_compare %>% 
-  mutate(boot = map2(data, decomp, ~bootstrap_sddm(1000, .x))) %>% 
+  mutate(boot = map2(data, decomp, ~bootstrap_sddm(10000, .x))) %>% 
   select(-data) %>% 
   unnest(boot)
 ```
@@ -668,9 +760,11 @@ trt_compare_sddm <- trt_compare_sddmvals %>%
   spread(decomp, boot_sddm) %>% 
   mutate(dif = `Includes Decompensated` - `Only Compensated`)
 
-quantile(trt_compare_sddm$dif, c(0.025, 0.975)) # 95% CI
-1-sum(trt_compare_sddm$dif > 0)/1000 # one-sided p value
+quantile(trt_compare_sddm$dif, c(0.025, 0.5, 0.975)) # 95% CI
+1-sum(trt_compare_sddm$dif > 0)/10000 # one-sided p value
 ```
+
+
 
 
 
@@ -916,6 +1010,46 @@ centre_plot <- trt_wide %>%
 centre_plot
 ```
 
+
+## Combined Model
+
+```{r}
+permuco::lmperm(abschange ~ Perc_Decomp + Centre + Perc_Alc, data=trt_wide)
+
+permuco::lmperm(abschange ~ Centre + Perc_Alc, data=trt_wide_c)
+permuco::lmperm(abschange ~ Centre + Perc_Alc, data=trt_wide_dc)
+```
+Let's examine why this might be.
+
+```{r}
+trt_wide %>% 
+  ggplot(aes(y=Perc_Decomp, x=Centre)) + 
+  geom_violin()
+
+permTS(formula=Perc_Decomp ~ as.factor(Centre), data=trt_wide,
+          method="exact.mc")
+```
+
+Most of the single-centre studies have high proportions of decompensated patients.
+
+```{r}
+trt_wide %>% 
+  ggplot(aes(y=Perc_Alc, x=Centre)) + 
+  geom_violin()
+
+permTS(formula=Perc_Alc ~ as.factor(Centre), data=trt_wide,
+          method="exact.mc")
+```
+Similarly, most of the single-centre studies have high proportions of alcoholic patients.
+
+### Days
+
+Reviewers were surprised at the lack of an effect of the number of days elapsed. Perhaps this was obscured by not having included the other confounding factors.
+
+```{r}
+permuco::lmperm(abschange ~ Perc_Decomp + Centre + Perc_Alc + Days, data=trt_wide)
+```
+This does not appear to be the case!
 
 
 ## Mean Value
@@ -1291,7 +1425,9 @@ appchange <- knitr::kable(measured_percs_summary[,-1]) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(measured_percs_summary))
 
-save_kable(appchange, file = "figures/appchange.jpg")
+appchange
+
+# save_kable(appchange, file = "figures/appchange.jpg")
 ```
 
 So, for a true effect of about 2mmHg in compensated patients, it will appear as if 12-16% would appear to worsen.  This fits with clinical experience.
@@ -1585,7 +1721,9 @@ difpower <- kable(difsims_power_ana[,-1]) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_power_ana))
 
-save_kable(difpower, "figures/difpower.jpg")
+difpower
+
+# save_kable(difpower, "figures/difpower.jpg")
 ```
 
 
@@ -1774,99 +1912,153 @@ difindifsimpars <- tidyr::crossing(
 And we run it
 
 ```{r}
-if(!file.exists(paste0("../DerivedData/difindifsims_decomp_", 
-                       nsims, ".rds")) || overwrite) {
-  
-  pb <- progress_bar$new(total = nrow(difindifsimpars))
-  
-  difindifsims <- difindifsimpars %>% 
-    mutate(sim = 1:nrow(difindifsimpars)) %>% 
-    group_by(sim) %>% 
-    nest(params = c(n, delta1, delta2, cv_delta)) %>% 
-    mutate(output = map(params, .progress = TRUE,
-                        ~{pb$tick(); 
-                          bind_rows(purrr::rerun(nsims, 
-                          HVPG_difindif_sim(.x$n, .x$delta1, 
-                                            .x$delta2, .x$cv_delta, 
-                                            decomp = 1)))}))
-  
-  saveRDS(difindifsims, 
-          paste0("../DerivedData/difindifsims_decomp_", nsims, ".rds"))
-  
-}
+# if(!file.exists(paste0("../DerivedData/difindifsims_decomp_", 
+#                        nsims, ".rds")) || overwrite) {
+#   
+#   pb <- progress_bar$new(total = nrow(difindifsimpars))
+#   
+#   difindifsims <- difindifsimpars %>% 
+#     mutate(sim = 1:nrow(difindifsimpars)) %>% 
+#     group_by(sim) %>% 
+#     nest(params = c(n, delta1, delta2, cv_delta)) %>% 
+#     mutate(output = map(params, .progress = TRUE,
+#                         ~{pb$tick(); 
+#                           bind_rows(purrr::rerun(nsims, 
+#                           HVPG_difindif_sim(.x$n, .x$delta1, 
+#                                             .x$delta2, .x$cv_delta, 
+#                                             decomp = 1)))}))
+#   
+#   saveRDS(difindifsims, 
+#           paste0("../DerivedData/difindifsims_decomp_", nsims, ".rds"))
+#   
+# }
   
 
 ```
 
 
-```{r}
-if(!file.exists(paste0("../DerivedData/difindifsims_comp_", 
-                       nsims, ".rds")) || overwrite) {
-  
-  pb <- progress_bar$new(total = nrow(difindifsimpars))
-  
-  difindifsims <- difindifsimpars %>% 
-    mutate(sim = 1:nrow(difindifsimpars)) %>% 
-    group_by(sim) %>% 
-    nest(params = c(n, delta1, delta2, cv_delta)) %>% 
-    mutate(output = map(params, 
-                        ~{pb$tick(); 
-                          bind_rows(purrr::rerun(nsims, 
-                          HVPG_difindif_sim(.x$n, .x$delta1, 
-                                            .x$delta2, .x$cv_delta,
-                                            decomp = 2)))}))
-  
-  saveRDS(difindifsims, 
-          paste0("../DerivedData/difindifsims_comp_", nsims, ".rds"))
-  
-}
+
+
+
+```{r, eval=FALSE}
+# if(!file.exists(paste0("../DerivedData/difindifsims_comp_", 
+#                        nsims, ".rds")) || overwrite) {
+#   
+#   pb <- progress_bar$new(total = nrow(difindifsimpars))
+#   
+#   difindifsims <- difindifsimpars %>% 
+#     mutate(sim = 1:nrow(difindifsimpars)) %>% 
+#     group_by(sim) %>% 
+#     nest(params = c(n, delta1, delta2, cv_delta)) %>% 
+#     mutate(output = map(params, 
+#                         ~{pb$tick(); 
+#                           bind_rows(purrr::rerun(nsims, 
+#                           HVPG_difindif_sim(.x$n, .x$delta1, 
+#                                             .x$delta2, .x$cv_delta,
+#                                             decomp = 2)))}))
+#   
+#   saveRDS(difindifsims, 
+#           paste0("../DerivedData/difindifsims_comp_", nsims, ".rds"))
+#   
+# }
 ```
-
-
-
-
-And extract the results
 
 ```{r, fig.height=8, fig.width=4}
-difindifsims_decomp <- readRDS(paste0("../DerivedData/difindifsims_decomp_", nsims, ".rds"))
-
-difindifsims_decomp_res <- difindifsims_decomp %>% 
-  ungroup() %>% 
-  mutate(power = map_dbl(output, ~mean(.x$p.value < 0.05))) %>% 
-  unnest(params) %>% 
-  mutate(deltadif = delta1 - delta2,
-         delta1 = as.factor(delta1),
-         delta2 = as.factor(delta2),
-         deltadif = as.factor(deltadif)) %>% 
-  #filter(deltadif != 0.5) %>% 
-  mutate(Effects = ifelse(cv_delta==0, "Homogeneous Effects", 
-                                       "Heterogeneous Effects")) %>% 
-  mutate(Effects = fct_inorder(Effects)) %>% 
-  mutate(decomp = trt_all$decomp[1])
-
-
-difindifsims_comp <- readRDS(paste0("../DerivedData/difindifsims_comp_", nsims, ".rds"))
-
-difindifsims_comp_res <- difindifsims_comp %>% 
-  ungroup() %>% 
-  mutate(power = map_dbl(output, ~mean(.x$p.value < 0.05))) %>% 
-  unnest(params) %>% 
-  mutate(deltadif = delta1 - delta2,
-         delta1 = as.factor(delta1),
-         delta2 = as.factor(delta2),
-         deltadif = as.factor(deltadif)) %>% 
-  #filter(deltadif != 0.5) %>% 
-  mutate(Effects = ifelse(cv_delta==0, "Homogeneous Effects", 
-                                       "Heterogeneous Effects")) %>% 
-  mutate(Effects = fct_inorder(Effects)) %>% 
-  mutate(decomp = trt_all$decomp[2])
-
-
-
-difindifsims_res <- bind_rows(difindifsims_decomp_res, 
-                              difindifsims_comp_res)
+# difindifsims_decomp <- readRDS(paste0("../DerivedData/difindifsims_decomp_", nsims, ".rds"))
+# 
+# difindifsims_decomp_res <- difindifsims_decomp %>% 
+#   ungroup() %>% 
+#   mutate(power = map_dbl(output, ~mean(.x$p.value < 0.05))) %>% 
+#   unnest(params) %>% 
+#   mutate(deltadif = delta1 - delta2,
+#          delta1 = as.factor(delta1),
+#          delta2 = as.factor(delta2),
+#          deltadif = as.factor(deltadif)) %>% 
+#   #filter(deltadif != 0.5) %>% 
+#   mutate(Effects = ifelse(cv_delta==0, "Homogeneous Effects", 
+#                                        "Heterogeneous Effects")) %>% 
+#   mutate(Effects = fct_inorder(Effects)) %>% 
+#   mutate(decomp = trt_all$decomp[1])
+# 
+# 
+# difindifsims_comp <- readRDS(paste0("../DerivedData/difindifsims_comp_", nsims, ".rds"))
+# 
+# difindifsims_comp_res <- difindifsims_comp %>% 
+#   ungroup() %>% 
+#   mutate(power = map_dbl(output, ~mean(.x$p.value < 0.05))) %>% 
+#   unnest(params) %>% 
+#   mutate(deltadif = delta1 - delta2,
+#          delta1 = as.factor(delta1),
+#          delta2 = as.factor(delta2),
+#          deltadif = as.factor(deltadif)) %>% 
+#   #filter(deltadif != 0.5) %>% 
+#   mutate(Effects = ifelse(cv_delta==0, "Homogeneous Effects", 
+#                                        "Heterogeneous Effects")) %>% 
+#   mutate(Effects = fct_inorder(Effects)) %>% 
+#   mutate(decomp = trt_all$decomp[2])
+# 
+# 
+# 
+# difindifsims_res <- bind_rows(difindifsims_decomp_res, 
+#                               difindifsims_comp_res)
 
 ```
+
+Now run in the cluster, and extract the results
+
+```{r, eval=FALSE}
+difindifsimfiles <- list.files("../Cluster/", pattern = "\\d.rds", 
+                               full.names = T)
+
+a <- as.numeric(str_match(difindifsimfiles, pattern = "_comp_(\\d*).rds")[,2])
+which(!(1:500 %in% a))
+
+b <- as.numeric(str_match(difindifsimfiles, pattern = "_decomp_(\\d*).rds")[,2])
+which(!(1:500 %in% b))
+
+
+difindifsims <- tibble(file = difindifsimfiles) %>% 
+  mutate(decomp = ifelse(str_detect(file, "_decomp_"), 
+                          "Includes Decompensated", 
+                          "Only Compensated"),
+         batch = as.numeric(str_match(file, "(\\d+).rds")[,2]),
+         sim_add = 50*(batch-1)) %>% 
+  rowwise() %>% 
+  mutate(data = map(file, readRDS))
+
+difindifsims <- difindifsims %>% 
+  ungroup() %>% 
+  unnest(data) %>% 
+  ungroup() %>% 
+  unnest(params) %>% 
+  unnest(output)
+
+difindifsims_res <- difindifsims %>% 
+  group_by(decomp, deltadif, n, delta1, delta2, cv_delta) %>% 
+  summarise(
+    power = mean(p.value < 0.05),
+    d = mean(d)
+  ) %>% 
+  ungroup() %>% 
+  mutate(Effects = ifelse(cv_delta==0, "Homogeneous Effects", 
+                                        "Heterogeneous Effects")) %>% 
+  mutate(delta1 = as.factor(delta1),
+         delta2 = as.factor(delta2),
+         deltadif = as.factor(deltadif))
+
+saveRDS(difindifsims_res, "../DerivedData/difindifsims_res.rds")
+```
+```{r}
+difindifsims_res <- readRDS("../DerivedData/difindifsims_res.rds")
+
+difindifsims_decomp_res <- filter(difindifsims_res, 
+                                  decomp=="Includes Decompensated")
+
+difindifsims_comp_res <- filter(difindifsims_res, 
+                                  decomp=="Only Compensated")
+```
+
+
 
 ## Plotting
 
@@ -1978,8 +2170,11 @@ difindiftable_comp <- difindifsims_power %>%
   kable_styling("striped", full_width = F) %>%
   pack_rows("Only Compensated", 1, decomp_change-1)
 
-save_kable(difindiftable_decomp, "figures/difindifpower_dc.jpg")
-save_kable(difindiftable_comp, "figures/difindifpower_c.jpg")
+difindiftable_decomp
+difindiftable_comp
+
+# save_kable(difindiftable_decomp, "figures/difindifpower_dc.jpg")
+# save_kable(difindiftable_comp, "figures/difindifpower_c.jpg")
 ```
 
 
