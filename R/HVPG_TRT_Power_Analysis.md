@@ -1,18 +1,16 @@
 ---
 title: "HVPG TRT and Power Analysis"
+always_allow_html: true
 output:
   html_document:
     df_print: paged
     keep_md: yes
-    always_allow_html: true
     toc: yes
     toc_float:
       toc_collapsed: yes
   pdf_document:
     toc: yes
     keep_tex: yes
-  word_document:
-    toc: yes
 ---
 
 # Aims
@@ -43,6 +41,7 @@ library(psych)
 library(permuco)
 library(metafor)
 library(viridis)
+library(pwr)
 
 extrafont::loadfonts(quiet = T)
 
@@ -146,60 +145,16 @@ saveRDS(trt_all, "../Cluster/trt_all.rds")
 kable(trt_all, digits=2)
 ```
 
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> decomp </th>
-   <th style="text-align:right;"> mean </th>
-   <th style="text-align:right;"> sd </th>
-   <th style="text-align:right;"> cv </th>
-   <th style="text-align:right;"> skew </th>
-   <th style="text-align:right;"> kurtosis </th>
-   <th style="text-align:right;"> icc </th>
-   <th style="text-align:right;"> icc_l </th>
-   <th style="text-align:right;"> icc_u </th>
-   <th style="text-align:right;"> wscv </th>
-   <th style="text-align:right;"> sdd </th>
-   <th style="text-align:right;"> absvar </th>
-   <th style="text-align:right;"> signvar </th>
-   <th style="text-align:right;"> signvar_sd </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Includes Decompensated </td>
-   <td style="text-align:right;"> 17.32 </td>
-   <td style="text-align:right;"> 4.83 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 0.16 </td>
-   <td style="text-align:right;"> -0.61 </td>
-   <td style="text-align:right;"> 0.85 </td>
-   <td style="text-align:right;"> 0.81 </td>
-   <td style="text-align:right;"> 0.88 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 5.16 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> -0.01 </td>
-   <td style="text-align:right;"> 0.15 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Only Compensated </td>
-   <td style="text-align:right;"> 16.40 </td>
-   <td style="text-align:right;"> 3.83 </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> 0.34 </td>
-   <td style="text-align:right;"> -0.39 </td>
-   <td style="text-align:right;"> 0.84 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> 0.88 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 4.29 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 0.13 </td>
-  </tr>
-</tbody>
-</table>
+
+\begin{tabular}{l|r|r|r|r|r|r|r|r|r|r|r|r|r}
+\hline
+decomp & mean & sd & cv & skew & kurtosis & icc & icc\_l & icc\_u & wscv & sdd & absvar & signvar & signvar\_sd\\
+\hline
+Includes Decompensated & 17.32 & 4.83 & 0.28 & 0.16 & -0.61 & 0.85 & 0.81 & 0.88 & 0.11 & 5.16 & 0.11 & -0.01 & 0.15\\
+\hline
+Only Compensated & 16.40 & 3.83 & 0.23 & 0.34 & -0.39 & 0.84 & 0.78 & 0.88 & 0.09 & 4.29 & 0.11 & 0.01 & 0.13\\
+\hline
+\end{tabular}
 
 I'll also create a tidy version of this to complement the individual studies.
 
@@ -218,39 +173,16 @@ trt_all_tidy <- trt_all %>%
 kable(trt_all_tidy, digits=2)
 ```
 
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> Patients </th>
-   <th style="text-align:right;"> Mean </th>
-   <th style="text-align:right;"> CV </th>
-   <th style="text-align:right;"> WSCV </th>
-   <th style="text-align:right;"> ICC </th>
-   <th style="text-align:right;"> SDD </th>
-   <th style="text-align:right;"> Change SD </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Only Compensated </td>
-   <td style="text-align:right;"> 16.40 </td>
-   <td style="text-align:right;"> 0.23 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 0.84 </td>
-   <td style="text-align:right;"> 4.29 </td>
-   <td style="text-align:right;"> 2.19 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Includes Decompensated </td>
-   <td style="text-align:right;"> 17.32 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 0.85 </td>
-   <td style="text-align:right;"> 5.16 </td>
-   <td style="text-align:right;"> 2.63 </td>
-  </tr>
-</tbody>
-</table>
+
+\begin{tabular}{l|r|r|r|r|r|r}
+\hline
+Patients & Mean & CV & WSCV & ICC & SDD & Change SD\\
+\hline
+Only Compensated & 16.40 & 0.23 & 0.09 & 0.84 & 4.29 & 2.19\\
+\hline
+Includes Decompensated & 17.32 & 0.28 & 0.11 & 0.85 & 5.16 & 2.63\\
+\hline
+\end{tabular}
 
 
 
@@ -440,564 +372,56 @@ tidytrt <- map_df(trt_study$outcomes, 'tidy') %>%
 knitr::kable(tidytrt, digits = 2)
 ```
 
-<table>
- <thead>
-  <tr>
-   <th style="text-align:left;"> Study </th>
-   <th style="text-align:right;"> mean </th>
-   <th style="text-align:right;"> sd </th>
-   <th style="text-align:right;"> cv </th>
-   <th style="text-align:right;"> skew </th>
-   <th style="text-align:right;"> kurtosis </th>
-   <th style="text-align:right;"> icc </th>
-   <th style="text-align:right;"> icc_l </th>
-   <th style="text-align:right;"> icc_u </th>
-   <th style="text-align:right;"> wscv </th>
-   <th style="text-align:right;"> sdd </th>
-   <th style="text-align:right;"> absvar </th>
-   <th style="text-align:right;"> signvar </th>
-   <th style="text-align:right;"> signvar_sd </th>
-   <th style="text-align:right;"> n </th>
-   <th style="text-align:left;"> Technique </th>
-   <th style="text-align:left;"> Catheter </th>
-   <th style="text-align:right;"> Perc_Alc </th>
-   <th style="text-align:right;"> Perc_Decomp </th>
-   <th style="text-align:right;"> Days </th>
-   <th style="text-align:left;"> Centre </th>
-   <th style="text-align:left;"> decomp </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Abraldes 2008 (D) </td>
-   <td style="text-align:right;"> 20.28 </td>
-   <td style="text-align:right;"> 4.43 </td>
-   <td style="text-align:right;"> 0.22 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> -1.00 </td>
-   <td style="text-align:right;"> 0.81 </td>
-   <td style="text-align:right;"> 0.62 </td>
-   <td style="text-align:right;"> 0.91 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 5.43 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> -0.03 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 36 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 44.0 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 30.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Abraldes 2008 (C) </td>
-   <td style="text-align:right;"> 18.47 </td>
-   <td style="text-align:right;"> 2.91 </td>
-   <td style="text-align:right;"> 0.16 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> -1.47 </td>
-   <td style="text-align:right;"> 0.81 </td>
-   <td style="text-align:right;"> 0.45 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 3.65 </td>
-   <td style="text-align:right;"> 0.08 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 44.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 30.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Albillos 1995 </td>
-   <td style="text-align:right;"> 19.60 </td>
-   <td style="text-align:right;"> 3.82 </td>
-   <td style="text-align:right;"> 0.20 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> -1.69 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 0.82 </td>
-   <td style="text-align:right;"> 0.98 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> 2.74 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 60.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 90.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Berzigotti 2010 </td>
-   <td style="text-align:right;"> 18.62 </td>
-   <td style="text-align:right;"> 2.21 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> -2.35 </td>
-   <td style="text-align:right;"> 0.96 </td>
-   <td style="text-align:right;"> 0.42 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.03 </td>
-   <td style="text-align:right;"> 1.55 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 16.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Blei 1987 </td>
-   <td style="text-align:right;"> 15.06 </td>
-   <td style="text-align:right;"> 4.67 </td>
-   <td style="text-align:right;"> 0.31 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> -1.53 </td>
-   <td style="text-align:right;"> 0.97 </td>
-   <td style="text-align:right;"> 0.85 </td>
-   <td style="text-align:right;"> 0.99 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 2.49 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Debernardi 2007 </td>
-   <td style="text-align:right;"> 14.59 </td>
-   <td style="text-align:right;"> 1.76 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.49 </td>
-   <td style="text-align:right;"> -0.56 </td>
-   <td style="text-align:right;"> 0.64 </td>
-   <td style="text-align:right;"> 0.32 </td>
-   <td style="text-align:right;"> 0.83 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 3.01 </td>
-   <td style="text-align:right;"> 0.08 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 34 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 21.7 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 365.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Jayakumar 2013 </td>
-   <td style="text-align:right;"> 22.72 </td>
-   <td style="text-align:right;"> 3.11 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 0.18 </td>
-   <td style="text-align:right;"> -0.90 </td>
-   <td style="text-align:right;"> 0.62 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.88 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 5.42 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 0.13 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 56.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Kimer 2017 </td>
-   <td style="text-align:right;"> 16.18 </td>
-   <td style="text-align:right;"> 4.46 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 0.69 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.63 </td>
-   <td style="text-align:right;"> 0.32 </td>
-   <td style="text-align:right;"> 0.82 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 7.62 </td>
-   <td style="text-align:right;"> 0.19 </td>
-   <td style="text-align:right;"> -0.02 </td>
-   <td style="text-align:right;"> 0.25 </td>
-   <td style="text-align:right;"> 36 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 72.2 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 28.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Lebrec 2012 </td>
-   <td style="text-align:right;"> 18.04 </td>
-   <td style="text-align:right;"> 3.01 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> -1.10 </td>
-   <td style="text-align:right;"> -0.06 </td>
-   <td style="text-align:right;"> 0.66 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.92 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 5.01 </td>
-   <td style="text-align:right;"> 0.13 </td>
-   <td style="text-align:right;"> -0.06 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Merkel 2004 </td>
-   <td style="text-align:right;"> 12.39 </td>
-   <td style="text-align:right;"> 1.18 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> -0.26 </td>
-   <td style="text-align:right;"> 0.87 </td>
-   <td style="text-align:right;"> 0.63 </td>
-   <td style="text-align:right;"> 0.96 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 1.22 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 57.7 </td>
-   <td style="text-align:right;"> 29.0 </td>
-   <td style="text-align:right;"> 730.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Moller 2000 </td>
-   <td style="text-align:right;"> 15.38 </td>
-   <td style="text-align:right;"> 5.45 </td>
-   <td style="text-align:right;"> 0.35 </td>
-   <td style="text-align:right;"> -0.41 </td>
-   <td style="text-align:right;"> -1.51 </td>
-   <td style="text-align:right;"> 0.96 </td>
-   <td style="text-align:right;"> 0.87 </td>
-   <td style="text-align:right;"> 0.99 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 3.10 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 87.5 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Reverter 2015 </td>
-   <td style="text-align:right;"> 15.76 </td>
-   <td style="text-align:right;"> 4.48 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 0.39 </td>
-   <td style="text-align:right;"> -1.06 </td>
-   <td style="text-align:right;"> 0.95 </td>
-   <td style="text-align:right;"> 0.90 </td>
-   <td style="text-align:right;"> 0.98 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 2.76 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> -0.03 </td>
-   <td style="text-align:right;"> 0.08 </td>
-   <td style="text-align:right;"> 42 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 47.6 </td>
-   <td style="text-align:right;"> 57.0 </td>
-   <td style="text-align:right;"> 15.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Schepke 2001 </td>
-   <td style="text-align:right;"> 18.25 </td>
-   <td style="text-align:right;"> 3.85 </td>
-   <td style="text-align:right;"> 0.21 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> -1.18 </td>
-   <td style="text-align:right;"> 0.69 </td>
-   <td style="text-align:right;"> 0.42 </td>
-   <td style="text-align:right;"> 0.85 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 6.01 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 36 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 72.5 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 7.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Spahr 2007 </td>
-   <td style="text-align:right;"> 17.69 </td>
-   <td style="text-align:right;"> 2.96 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> -0.07 </td>
-   <td style="text-align:right;"> -1.32 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> -0.47 </td>
-   <td style="text-align:right;"> 0.67 </td>
-   <td style="text-align:right;"> 0.16 </td>
-   <td style="text-align:right;"> 7.64 </td>
-   <td style="text-align:right;"> 0.21 </td>
-   <td style="text-align:right;"> -0.07 </td>
-   <td style="text-align:right;"> 0.22 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> Wedged Catheter </td>
-   <td style="text-align:left;"> Wedged </td>
-   <td style="text-align:right;"> 62.5 </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 90.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Schwarzer 2017 </td>
-   <td style="text-align:right;"> 20.50 </td>
-   <td style="text-align:right;"> 4.86 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> -0.06 </td>
-   <td style="text-align:right;"> -1.50 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 0.83 </td>
-   <td style="text-align:right;"> 0.98 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 3.39 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 80.0 </td>
-   <td style="text-align:right;"> 80.0 </td>
-   <td style="text-align:right;"> 28.00 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Pomier 1987 </td>
-   <td style="text-align:right;"> 15.42 </td>
-   <td style="text-align:right;"> 5.50 </td>
-   <td style="text-align:right;"> 0.36 </td>
-   <td style="text-align:right;"> 1.45 </td>
-   <td style="text-align:right;"> 0.52 </td>
-   <td style="text-align:right;"> 0.95 </td>
-   <td style="text-align:right;"> 0.54 </td>
-   <td style="text-align:right;"> 0.99 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 3.71 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.08 </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 62.5 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 172.50 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Hidaka 2011 </td>
-   <td style="text-align:right;"> 14.75 </td>
-   <td style="text-align:right;"> 3.71 </td>
-   <td style="text-align:right;"> 0.25 </td>
-   <td style="text-align:right;"> 0.27 </td>
-   <td style="text-align:right;"> -0.87 </td>
-   <td style="text-align:right;"> 0.79 </td>
-   <td style="text-align:right;"> 0.59 </td>
-   <td style="text-align:right;"> 0.90 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 4.80 </td>
-   <td style="text-align:right;"> 0.13 </td>
-   <td style="text-align:right;"> -0.06 </td>
-   <td style="text-align:right;"> 0.16 </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 16.7 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> McCormick 1992 </td>
-   <td style="text-align:right;"> 17.44 </td>
-   <td style="text-align:right;"> 4.40 </td>
-   <td style="text-align:right;"> 0.25 </td>
-   <td style="text-align:right;"> -0.18 </td>
-   <td style="text-align:right;"> -0.32 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 0.87 </td>
-   <td style="text-align:right;"> 0.97 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 3.04 </td>
-   <td style="text-align:right;"> 0.08 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 40 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Pozzi 2005 </td>
-   <td style="text-align:right;"> 16.11 </td>
-   <td style="text-align:right;"> 3.61 </td>
-   <td style="text-align:right;"> 0.22 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> -1.14 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> 0.41 </td>
-   <td style="text-align:right;"> 0.93 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 4.89 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 0.08 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 182.50 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Garcia-Tsao 2020 (C) </td>
-   <td style="text-align:right;"> 16.63 </td>
-   <td style="text-align:right;"> 4.00 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> -0.50 </td>
-   <td style="text-align:right;"> 0.82 </td>
-   <td style="text-align:right;"> 0.72 </td>
-   <td style="text-align:right;"> 0.88 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 4.75 </td>
-   <td style="text-align:right;"> 0.13 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 0.15 </td>
-   <td style="text-align:right;"> 100 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 168.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Only Compensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Garcia-Tsao 2020 (D) </td>
-   <td style="text-align:right;"> 16.32 </td>
-   <td style="text-align:right;"> 4.73 </td>
-   <td style="text-align:right;"> 0.29 </td>
-   <td style="text-align:right;"> -0.76 </td>
-   <td style="text-align:right;"> -0.15 </td>
-   <td style="text-align:right;"> 0.26 </td>
-   <td style="text-align:right;"> -0.19 </td>
-   <td style="text-align:right;"> 0.72 </td>
-   <td style="text-align:right;"> 0.27 </td>
-   <td style="text-align:right;"> 12.17 </td>
-   <td style="text-align:right;"> 0.35 </td>
-   <td style="text-align:right;"> -0.25 </td>
-   <td style="text-align:right;"> 0.31 </td>
-   <td style="text-align:right;"> 14 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 168.00 </td>
-   <td style="text-align:left;"> Multi-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Fukada 2014 </td>
-   <td style="text-align:right;"> 17.28 </td>
-   <td style="text-align:right;"> 4.15 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> 0.32 </td>
-   <td style="text-align:right;"> -0.83 </td>
-   <td style="text-align:right;"> 0.93 </td>
-   <td style="text-align:right;"> 0.77 </td>
-   <td style="text-align:right;"> 0.98 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 3.19 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> Balloon-tipped Catheter </td>
-   <td style="text-align:left;"> Balloon tip </td>
-   <td style="text-align:right;"> 25.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:left;"> Single-centre </td>
-   <td style="text-align:left;"> Includes Decompensated </td>
-  </tr>
-</tbody>
-</table>
+
+\begin{tabular}{l|r|r|r|r|r|r|r|r|r|r|r|r|r|r|l|l|r|r|r|l|l}
+\hline
+Study & mean & sd & cv & skew & kurtosis & icc & icc\_l & icc\_u & wscv & sdd & absvar & signvar & signvar\_sd & n & Technique & Catheter & Perc\_Alc & Perc\_Decomp & Days & Centre & decomp\\
+\hline
+Abraldes 2008 (D) & 20.28 & 4.43 & 0.22 & 0.12 & -1.00 & 0.81 & 0.62 & 0.91 & 0.10 & 5.43 & 0.11 & -0.03 & 0.14 & 36 & Balloon-tipped Catheter & Balloon tip & 44.0 & 100.0 & 30.00 & Multi-centre & Includes Decompensated\\
+\hline
+Abraldes 2008 (C) & 18.47 & 2.91 & 0.16 & 0.28 & -1.47 & 0.81 & 0.45 & 0.94 & 0.07 & 3.65 & 0.08 & 0.02 & 0.10 & 16 & Balloon-tipped Catheter & Balloon tip & 44.0 & 0.0 & 30.00 & Multi-centre & Only Compensated\\
+\hline
+Albillos 1995 & 19.60 & 3.82 & 0.20 & 0.14 & -1.69 & 0.94 & 0.82 & 0.98 & 0.05 & 2.74 & 0.05 & 0.01 & 0.07 & 20 & Balloon-tipped Catheter & Balloon tip & 60.0 & 0.0 & 90.00 & Single-centre & Only Compensated\\
+\hline
+Berzigotti 2010 & 18.62 & 2.21 & 0.12 & 0.05 & -2.35 & 0.96 & 0.42 & 1.00 & 0.03 & 1.55 & 0.04 & 0.01 & 0.06 & 4 & Balloon-tipped Catheter & Balloon tip & 50.0 & 0.0 & 16.00 & Single-centre & Only Compensated\\
+\hline
+Blei 1987 & 15.06 & 4.67 & 0.31 & 0.14 & -1.53 & 0.97 & 0.85 & 0.99 & 0.06 & 2.49 & 0.06 & 0.05 & 0.07 & 18 & Balloon-tipped Catheter & Balloon tip & 100.0 & 100.0 & 0.04 & Single-centre & Includes Decompensated\\
+\hline
+Debernardi 2007 & 14.59 & 1.76 & 0.12 & 0.49 & -0.56 & 0.64 & 0.32 & 0.83 & 0.07 & 3.01 & 0.08 & 0.05 & 0.10 & 34 & Balloon-tipped Catheter & Balloon tip & 21.7 & 0.0 & 365.00 & Single-centre & Only Compensated\\
+\hline
+Jayakumar 2013 & 22.72 & 3.11 & 0.14 & 0.18 & -0.90 & 0.62 & 0.10 & 0.88 & 0.09 & 5.42 & 0.11 & 0.00 & 0.13 & 16 & Balloon-tipped Catheter & Balloon tip & 75.0 & 100.0 & 56.00 & Multi-centre & Includes Decompensated\\
+\hline
+Kimer 2017 & 16.18 & 4.46 & 0.28 & 0.69 & 0.10 & 0.63 & 0.32 & 0.82 & 0.17 & 7.62 & 0.19 & -0.02 & 0.25 & 36 & Balloon-tipped Catheter & Balloon tip & 72.2 & 100.0 & 28.00 & Single-centre & Includes Decompensated\\
+\hline
+Lebrec 2012 & 18.04 & 3.01 & 0.17 & -1.10 & -0.06 & 0.66 & 0.06 & 0.92 & 0.10 & 5.01 & 0.13 & -0.06 & 0.14 & 12 & Balloon-tipped Catheter & Balloon tip & 50.0 & 50.0 & 0.04 & Multi-centre & Includes Decompensated\\
+\hline
+Merkel 2004 & 12.39 & 1.18 & 0.10 & 0.12 & -0.26 & 0.87 & 0.63 & 0.96 & 0.04 & 1.22 & 0.04 & 0.02 & 0.05 & 18 & Balloon-tipped Catheter & Balloon tip & 57.7 & 29.0 & 730.00 & Multi-centre & Includes Decompensated\\
+\hline
+Moller 2000 & 15.38 & 5.45 & 0.35 & -0.41 & -1.51 & 0.96 & 0.87 & 0.99 & 0.07 & 3.10 & 0.07 & 0.02 & 0.11 & 16 & Balloon-tipped Catheter & Balloon tip & 100.0 & 87.5 & 0.02 & Single-centre & Includes Decompensated\\
+\hline
+Reverter 2015 & 15.76 & 4.48 & 0.28 & 0.39 & -1.06 & 0.95 & 0.90 & 0.98 & 0.06 & 2.76 & 0.07 & -0.03 & 0.08 & 42 & Balloon-tipped Catheter & Balloon tip & 47.6 & 57.0 & 15.00 & Multi-centre & Includes Decompensated\\
+\hline
+Schepke 2001 & 18.25 & 3.85 & 0.21 & 0.06 & -1.18 & 0.69 & 0.42 & 0.85 & 0.12 & 6.01 & 0.12 & 0.00 & 0.17 & 36 & Balloon-tipped Catheter & Balloon tip & 72.5 & 100.0 & 7.00 & Single-centre & Includes Decompensated\\
+\hline
+Spahr 2007 & 17.69 & 2.96 & 0.17 & -0.07 & -1.32 & 0.14 & -0.47 & 0.67 & 0.16 & 7.64 & 0.21 & -0.07 & 0.22 & 16 & Wedged Catheter & Wedged & 62.5 & 75.0 & 90.00 & Single-centre & Includes Decompensated\\
+\hline
+Schwarzer 2017 & 20.50 & 4.86 & 0.24 & -0.06 & -1.50 & 0.94 & 0.83 & 0.98 & 0.06 & 3.39 & 0.06 & 0.02 & 0.09 & 20 & Balloon-tipped Catheter & Balloon tip & 80.0 & 80.0 & 28.00 & Single-centre & Includes Decompensated\\
+\hline
+Pomier 1987 & 15.42 & 5.50 & 0.36 & 1.45 & 0.52 & 0.95 & 0.54 & 0.99 & 0.09 & 3.71 & 0.09 & 0.10 & 0.08 & 12 & Balloon-tipped Catheter & Balloon tip & 62.5 & 100.0 & 172.50 & Single-centre & Includes Decompensated\\
+\hline
+Hidaka 2011 & 14.75 & 3.71 & 0.25 & 0.27 & -0.87 & 0.79 & 0.59 & 0.90 & 0.12 & 4.80 & 0.13 & -0.06 & 0.16 & 38 & Balloon-tipped Catheter & Balloon tip & 16.7 & 0.0 & 0.01 & Multi-centre & Only Compensated\\
+\hline
+McCormick 1992 & 17.44 & 4.40 & 0.25 & -0.18 & -0.32 & 0.94 & 0.87 & 0.97 & 0.06 & 3.04 & 0.08 & 0.02 & 0.09 & 40 & Balloon-tipped Catheter & Balloon tip & 75.0 & 75.0 & 0.01 & Single-centre & Includes Decompensated\\
+\hline
+Pozzi 2005 & 16.11 & 3.61 & 0.22 & 0.10 & -1.14 & 0.78 & 0.41 & 0.93 & 0.11 & 4.89 & 0.14 & 0.08 & 0.14 & 18 & Balloon-tipped Catheter & Balloon tip & 0.0 & 0.0 & 182.50 & Single-centre & Only Compensated\\
+\hline
+Garcia-Tsao 2020 (C) & 16.63 & 4.00 & 0.24 & 0.24 & -0.50 & 0.82 & 0.72 & 0.88 & 0.10 & 4.75 & 0.13 & 0.01 & 0.15 & 100 & Balloon-tipped Catheter & Balloon tip & 0.0 & 0.0 & 168.00 & Multi-centre & Only Compensated\\
+\hline
+Garcia-Tsao 2020 (D) & 16.32 & 4.73 & 0.29 & -0.76 & -0.15 & 0.26 & -0.19 & 0.72 & 0.27 & 12.17 & 0.35 & -0.25 & 0.31 & 14 & Balloon-tipped Catheter & Balloon tip & 0.0 & 100.0 & 168.00 & Multi-centre & Includes Decompensated\\
+\hline
+Fukada 2014 & 17.28 & 4.15 & 0.24 & 0.32 & -0.83 & 0.93 & 0.77 & 0.98 & 0.07 & 3.19 & 0.07 & 0.02 & 0.10 & 16 & Balloon-tipped Catheter & Balloon tip & 25.0 & 50.0 & 0.04 & Single-centre & Includes Decompensated\\
+\hline
+\end{tabular}
 
 
 Now let's make a table for the paper with the relevant things.
@@ -1030,313 +454,62 @@ tidytrt_kable <- knitr::kable(tidytrt_table[,-1], digits=2) %>%
 tidytrt_kable
 ```
 
-<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Study </th>
-   <th style="text-align:right;"> n </th>
-   <th style="text-align:right;"> Decompensated (%) </th>
-   <th style="text-align:right;"> Alcoholic (%) </th>
-   <th style="text-align:right;"> Mean Days Elapsed </th>
-   <th style="text-align:right;"> Mean </th>
-   <th style="text-align:right;"> CV </th>
-   <th style="text-align:right;"> WSCV </th>
-   <th style="text-align:right;"> ICC </th>
-   <th style="text-align:right;"> SDD </th>
-   <th style="text-align:right;"> Change SD </th>
-  </tr>
- </thead>
-<tbody>
-  <tr grouplength="7"><td colspan="11" style="border-bottom: 1px solid;"><strong>Only Compensated</strong></td></tr>
-<tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Abraldes 2008 (C) </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 44.0 </td>
-   <td style="text-align:right;"> 30.00 </td>
-   <td style="text-align:right;"> 18.47 </td>
-   <td style="text-align:right;"> 0.16 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0.81 </td>
-   <td style="text-align:right;"> 3.65 </td>
-   <td style="text-align:right;"> 1.94 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Albillos 1995 </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 60.0 </td>
-   <td style="text-align:right;"> 90.00 </td>
-   <td style="text-align:right;"> 19.60 </td>
-   <td style="text-align:right;"> 0.20 </td>
-   <td style="text-align:right;"> 0.05 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 2.74 </td>
-   <td style="text-align:right;"> 1.46 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Berzigotti 2010 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 16.00 </td>
-   <td style="text-align:right;"> 18.62 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.03 </td>
-   <td style="text-align:right;"> 0.96 </td>
-   <td style="text-align:right;"> 1.55 </td>
-   <td style="text-align:right;"> 1.06 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Debernardi 2007 </td>
-   <td style="text-align:right;"> 34 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 21.7 </td>
-   <td style="text-align:right;"> 365.00 </td>
-   <td style="text-align:right;"> 14.59 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0.64 </td>
-   <td style="text-align:right;"> 3.01 </td>
-   <td style="text-align:right;"> 1.40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Garcia-Tsao 2020 (C) </td>
-   <td style="text-align:right;"> 100 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 168.00 </td>
-   <td style="text-align:right;"> 16.63 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.82 </td>
-   <td style="text-align:right;"> 4.75 </td>
-   <td style="text-align:right;"> 2.44 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Hidaka 2011 </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 16.7 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 14.75 </td>
-   <td style="text-align:right;"> 0.25 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.79 </td>
-   <td style="text-align:right;"> 4.80 </td>
-   <td style="text-align:right;"> 2.37 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Pozzi 2005 </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 182.50 </td>
-   <td style="text-align:right;"> 16.11 </td>
-   <td style="text-align:right;"> 0.22 </td>
-   <td style="text-align:right;"> 0.11 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> 4.89 </td>
-   <td style="text-align:right;"> 2.24 </td>
-  </tr>
-  <tr grouplength="15"><td colspan="11" style="border-bottom: 1px solid;"><strong>Includes Decompensated</strong></td></tr>
-<tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Abraldes 2008 (D) </td>
-   <td style="text-align:right;"> 36 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 44.0 </td>
-   <td style="text-align:right;"> 30.00 </td>
-   <td style="text-align:right;"> 20.28 </td>
-   <td style="text-align:right;"> 0.22 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.81 </td>
-   <td style="text-align:right;"> 5.43 </td>
-   <td style="text-align:right;"> 2.77 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Blei 1987 </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 15.06 </td>
-   <td style="text-align:right;"> 0.31 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.97 </td>
-   <td style="text-align:right;"> 2.49 </td>
-   <td style="text-align:right;"> 1.06 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Fukada 2014 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 25.0 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 17.28 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0.93 </td>
-   <td style="text-align:right;"> 3.19 </td>
-   <td style="text-align:right;"> 1.71 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Garcia-Tsao 2020 (D) </td>
-   <td style="text-align:right;"> 14 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 168.00 </td>
-   <td style="text-align:right;"> 16.32 </td>
-   <td style="text-align:right;"> 0.29 </td>
-   <td style="text-align:right;"> 0.27 </td>
-   <td style="text-align:right;"> 0.26 </td>
-   <td style="text-align:right;"> 12.17 </td>
-   <td style="text-align:right;"> 5.06 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Jayakumar 2013 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 56.00 </td>
-   <td style="text-align:right;"> 22.72 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 0.62 </td>
-   <td style="text-align:right;"> 5.42 </td>
-   <td style="text-align:right;"> 2.96 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Kimer 2017 </td>
-   <td style="text-align:right;"> 36 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 72.2 </td>
-   <td style="text-align:right;"> 28.00 </td>
-   <td style="text-align:right;"> 16.18 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 0.63 </td>
-   <td style="text-align:right;"> 7.62 </td>
-   <td style="text-align:right;"> 3.98 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Lebrec 2012 </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 18.04 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.66 </td>
-   <td style="text-align:right;"> 5.01 </td>
-   <td style="text-align:right;"> 2.54 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> McCormick 1992 </td>
-   <td style="text-align:right;"> 40 </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 0.01 </td>
-   <td style="text-align:right;"> 17.44 </td>
-   <td style="text-align:right;"> 0.25 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 3.04 </td>
-   <td style="text-align:right;"> 1.56 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Merkel 2004 </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:right;"> 29.0 </td>
-   <td style="text-align:right;"> 57.7 </td>
-   <td style="text-align:right;"> 730.00 </td>
-   <td style="text-align:right;"> 12.39 </td>
-   <td style="text-align:right;"> 0.10 </td>
-   <td style="text-align:right;"> 0.04 </td>
-   <td style="text-align:right;"> 0.87 </td>
-   <td style="text-align:right;"> 1.22 </td>
-   <td style="text-align:right;"> 0.62 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Moller 2000 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:right;"> 87.5 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 0.02 </td>
-   <td style="text-align:right;"> 15.38 </td>
-   <td style="text-align:right;"> 0.35 </td>
-   <td style="text-align:right;"> 0.07 </td>
-   <td style="text-align:right;"> 0.96 </td>
-   <td style="text-align:right;"> 3.10 </td>
-   <td style="text-align:right;"> 1.67 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Pomier 1987 </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 62.5 </td>
-   <td style="text-align:right;"> 172.50 </td>
-   <td style="text-align:right;"> 15.42 </td>
-   <td style="text-align:right;"> 0.36 </td>
-   <td style="text-align:right;"> 0.09 </td>
-   <td style="text-align:right;"> 0.95 </td>
-   <td style="text-align:right;"> 3.71 </td>
-   <td style="text-align:right;"> 1.26 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Reverter 2015 </td>
-   <td style="text-align:right;"> 42 </td>
-   <td style="text-align:right;"> 57.0 </td>
-   <td style="text-align:right;"> 47.6 </td>
-   <td style="text-align:right;"> 15.00 </td>
-   <td style="text-align:right;"> 15.76 </td>
-   <td style="text-align:right;"> 0.28 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.95 </td>
-   <td style="text-align:right;"> 2.76 </td>
-   <td style="text-align:right;"> 1.34 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Schepke 2001 </td>
-   <td style="text-align:right;"> 36 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 72.5 </td>
-   <td style="text-align:right;"> 7.00 </td>
-   <td style="text-align:right;"> 18.25 </td>
-   <td style="text-align:right;"> 0.21 </td>
-   <td style="text-align:right;"> 0.12 </td>
-   <td style="text-align:right;"> 0.69 </td>
-   <td style="text-align:right;"> 6.01 </td>
-   <td style="text-align:right;"> 3.15 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Schwarzer 2017 </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:right;"> 80.0 </td>
-   <td style="text-align:right;"> 80.0 </td>
-   <td style="text-align:right;"> 28.00 </td>
-   <td style="text-align:right;"> 20.50 </td>
-   <td style="text-align:right;"> 0.24 </td>
-   <td style="text-align:right;"> 0.06 </td>
-   <td style="text-align:right;"> 0.94 </td>
-   <td style="text-align:right;"> 3.39 </td>
-   <td style="text-align:right;"> 1.78 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> Spahr 2007 </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:right;"> 75.0 </td>
-   <td style="text-align:right;"> 62.5 </td>
-   <td style="text-align:right;"> 90.00 </td>
-   <td style="text-align:right;"> 17.69 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 0.16 </td>
-   <td style="text-align:right;"> 0.14 </td>
-   <td style="text-align:right;"> 7.64 </td>
-   <td style="text-align:right;"> 3.95 </td>
-  </tr>
-</tbody>
-</table>
+\begin{table}[H]
+\centering
+\begin{tabular}{l|r|r|r|r|r|r|r|r|r|r}
+\hline
+Study & n & Decompensated (\%) & Alcoholic (\%) & Mean Days Elapsed & Mean & CV & WSCV & ICC & SDD & Change SD\\
+\hline
+\multicolumn{11}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}Abraldes 2008 (C) & 16 & 0.0 & 44.0 & 30.00 & 18.47 & 0.16 & 0.07 & 0.81 & 3.65 & 1.94\\
+\hline
+\hspace{1em}Albillos 1995 & 20 & 0.0 & 60.0 & 90.00 & 19.60 & 0.20 & 0.05 & 0.94 & 2.74 & 1.46\\
+\hline
+\hspace{1em}Berzigotti 2010 & 4 & 0.0 & 50.0 & 16.00 & 18.62 & 0.12 & 0.03 & 0.96 & 1.55 & 1.06\\
+\hline
+\hspace{1em}Debernardi 2007 & 34 & 0.0 & 21.7 & 365.00 & 14.59 & 0.12 & 0.07 & 0.64 & 3.01 & 1.40\\
+\hline
+\hspace{1em}Garcia-Tsao 2020 (C) & 100 & 0.0 & 0.0 & 168.00 & 16.63 & 0.24 & 0.10 & 0.82 & 4.75 & 2.44\\
+\hline
+\hspace{1em}Hidaka 2011 & 38 & 0.0 & 16.7 & 0.01 & 14.75 & 0.25 & 0.12 & 0.79 & 4.80 & 2.37\\
+\hline
+\hspace{1em}Pozzi 2005 & 18 & 0.0 & 0.0 & 182.50 & 16.11 & 0.22 & 0.11 & 0.78 & 4.89 & 2.24\\
+\hline
+\multicolumn{11}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}Abraldes 2008 (D) & 36 & 100.0 & 44.0 & 30.00 & 20.28 & 0.22 & 0.10 & 0.81 & 5.43 & 2.77\\
+\hline
+\hspace{1em}Blei 1987 & 18 & 100.0 & 100.0 & 0.04 & 15.06 & 0.31 & 0.06 & 0.97 & 2.49 & 1.06\\
+\hline
+\hspace{1em}Fukada 2014 & 16 & 50.0 & 25.0 & 0.04 & 17.28 & 0.24 & 0.07 & 0.93 & 3.19 & 1.71\\
+\hline
+\hspace{1em}Garcia-Tsao 2020 (D) & 14 & 100.0 & 0.0 & 168.00 & 16.32 & 0.29 & 0.27 & 0.26 & 12.17 & 5.06\\
+\hline
+\hspace{1em}Jayakumar 2013 & 16 & 100.0 & 75.0 & 56.00 & 22.72 & 0.14 & 0.09 & 0.62 & 5.42 & 2.96\\
+\hline
+\hspace{1em}Kimer 2017 & 36 & 100.0 & 72.2 & 28.00 & 16.18 & 0.28 & 0.17 & 0.63 & 7.62 & 3.98\\
+\hline
+\hspace{1em}Lebrec 2012 & 12 & 50.0 & 50.0 & 0.04 & 18.04 & 0.17 & 0.10 & 0.66 & 5.01 & 2.54\\
+\hline
+\hspace{1em}McCormick 1992 & 40 & 75.0 & 75.0 & 0.01 & 17.44 & 0.25 & 0.06 & 0.94 & 3.04 & 1.56\\
+\hline
+\hspace{1em}Merkel 2004 & 18 & 29.0 & 57.7 & 730.00 & 12.39 & 0.10 & 0.04 & 0.87 & 1.22 & 0.62\\
+\hline
+\hspace{1em}Moller 2000 & 16 & 87.5 & 100.0 & 0.02 & 15.38 & 0.35 & 0.07 & 0.96 & 3.10 & 1.67\\
+\hline
+\hspace{1em}Pomier 1987 & 12 & 100.0 & 62.5 & 172.50 & 15.42 & 0.36 & 0.09 & 0.95 & 3.71 & 1.26\\
+\hline
+\hspace{1em}Reverter 2015 & 42 & 57.0 & 47.6 & 15.00 & 15.76 & 0.28 & 0.06 & 0.95 & 2.76 & 1.34\\
+\hline
+\hspace{1em}Schepke 2001 & 36 & 100.0 & 72.5 & 7.00 & 18.25 & 0.21 & 0.12 & 0.69 & 6.01 & 3.15\\
+\hline
+\hspace{1em}Schwarzer 2017 & 20 & 80.0 & 80.0 & 28.00 & 20.50 & 0.24 & 0.06 & 0.94 & 3.39 & 1.78\\
+\hline
+\hspace{1em}Spahr 2007 & 16 & 75.0 & 62.5 & 90.00 & 17.69 & 0.17 & 0.16 & 0.14 & 7.64 & 3.95\\
+\hline
+\end{tabular}
+\end{table}
 
 ```r
 # save_kable(tidytrt_kable, file = "figures/tidytrt_kable.jpg")
@@ -2002,7 +1175,7 @@ ggplot(trt_wide, aes(x=abschange)) +
   geom_density(fill="black",alpha=0.5)
 ```
 
-![](figures/unnamed-chunk-25-1.png)<!-- -->
+![](figures/unnamed-chunk-89-1.png)<!-- -->
 And between groups
 
 
@@ -2013,7 +1186,7 @@ ggplot(trt_wide, aes(x=abschange)) +
   theme(legend.position="bottom")
 ```
 
-![](figures/unnamed-chunk-26-1.png)<!-- -->
+![](figures/unnamed-chunk-90-1.png)<!-- -->
 
 And let's get some values for that too
 
@@ -2038,7 +1211,7 @@ psych::describeBy(trt_wide$abschange, group=trt_wide$decomp)
 ## group: Includes Decompensated
 ##    vars   n mean   sd median trimmed  mad min  max range skew kurtosis   se
 ## X1    1 166 1.79 1.94      1    1.46 1.11   0 13.5  13.5 2.45     8.89 0.15
-## ------------------------------------------------------------ 
+## -------------------------------------------------------------------------------------------------------------------------------------------------- 
 ## group: Only Compensated
 ##    vars   n mean   sd median trimmed  mad min max range skew kurtosis   se
 ## X1    1 115 1.67 1.42      1    1.56 1.48   0   6     6 0.57    -0.64 0.13
@@ -2055,7 +1228,7 @@ ggplot(trt_wide, aes(x=change)) +
   geom_density(fill="black",alpha=0.5)
 ```
 
-![](figures/unnamed-chunk-28-1.png)<!-- -->
+![](figures/unnamed-chunk-92-1.png)<!-- -->
 ... and by group
 
 
@@ -2066,7 +1239,7 @@ ggplot(trt_wide, aes(x=change)) +
   theme(legend.position="bottom")
 ```
 
-![](figures/unnamed-chunk-29-1.png)<!-- -->
+![](figures/unnamed-chunk-93-1.png)<!-- -->
 
 For signed differences, let's assess whether they differ from zero.
 
@@ -2076,8 +1249,7 @@ summary(lmer(change ~ 1 + (1|Study), data=trt_wide))
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ 1 + (1 | Study)
 ##    Data: trt_wide
 ## 
@@ -2103,8 +1275,7 @@ summary(lmer(change ~ 1 + (1|Study), data=trt_wide_c))
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ 1 + (1 | Study)
 ##    Data: trt_wide_c
 ## 
@@ -2130,8 +1301,7 @@ summary(lmer(change ~ 1 + (1|Study), data=trt_wide_dc))
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ 1 + (1 | Study)
 ##    Data: trt_wide_dc
 ## 
@@ -2177,7 +1347,7 @@ psych::describeBy(trt_wide$change, group=trt_wide$decomp)
 ## group: Includes Decompensated
 ##    vars   n mean   sd median trimmed  mad   min max range  skew kurtosis  se
 ## X1    1 166 -0.2 2.63      0    -0.1 1.48 -13.5   9  22.5 -0.75     4.57 0.2
-## ------------------------------------------------------------ 
+## -------------------------------------------------------------------------------------------------------------------------------------------------- 
 ## group: Only Compensated
 ##    vars   n mean   sd median trimmed  mad  min max range skew kurtosis  se
 ## X1    1 115 0.22 2.19      0    0.22 1.48 -4.5   6  10.5 0.08     -0.4 0.2
@@ -2206,7 +1376,7 @@ sign_change_distr <- trt_wide %>%
 sign_change_distr
 ```
 
-![](figures/unnamed-chunk-32-1.png)<!-- -->
+![](figures/unnamed-chunk-96-1.png)<!-- -->
 
 ```r
 abs_change_distr <- trt_wide %>% 
@@ -2225,7 +1395,7 @@ abs_change_distr <- trt_wide %>%
 abs_change_distr
 ```
 
-![](figures/unnamed-chunk-32-2.png)<!-- -->
+![](figures/unnamed-chunk-96-2.png)<!-- -->
 
 
 
@@ -2266,12 +1436,9 @@ permuco::lmperm(abschange ~ Perc_Decomp, data=trt_wide)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
-## (Intercept) 1.499246   0.153912   9.741           1.725e-19                   
-## Perc_Decomp 0.005031   0.002367   2.126           3.439e-02             0.9812
-##             permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                        
-## Perc_Decomp              0.019               0.0362
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept) 1.499246   0.153912   9.741           1.725e-19                                                           
+## Perc_Decomp 0.005031   0.002367   2.126           3.439e-02             0.9812              0.019               0.0362
 ```
 
 
@@ -2289,7 +1456,7 @@ decomp_plot <- ggplot(trt_wide, aes(x=Perc_Decomp, y=abschange)) +
 decomp_plot
 ```
 
-![](figures/unnamed-chunk-34-1.png)<!-- -->
+![](figures/unnamed-chunk-98-1.png)<!-- -->
 
 
 ## Days elapsed
@@ -2302,14 +1469,10 @@ permuco::lmperm(abschange ~ Days + Perc_Decomp, data=trt_wide)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##               Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)  1.6031874  0.1994382  8.0385           2.624e-14
-## Days        -0.0006133  0.0007477 -0.8202           4.128e-01
-## Perc_Decomp  0.0041622  0.0025941  1.6045           1.097e-01
-##             permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                           
-## Days                    0.2076             0.7926               0.3990
-## Perc_Decomp             0.9524             0.0478               0.1026
+##               Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)  1.6031874  0.1994382  8.0385           2.624e-14                                                           
+## Days        -0.0006133  0.0007477 -0.8202           4.128e-01             0.2076             0.7926               0.3990
+## Perc_Decomp  0.0041622  0.0025941  1.6045           1.097e-01             0.9524             0.0478               0.1026
 ```
 
 Now let's plot, after correcting for the effect of the patient groups.
@@ -2344,7 +1507,7 @@ days_plot <- trt_wide %>%
 days_plot
 ```
 
-![](figures/unnamed-chunk-36-1.png)<!-- -->
+![](figures/unnamed-chunk-100-1.png)<!-- -->
 
 ## Percentage Alcoholic
 
@@ -2356,14 +1519,10 @@ permuco::lmperm(abschange ~ Perc_Alc + Perc_Decomp, data=trt_wide)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
-## (Intercept)  1.94758   0.166155  11.721           4.711e-26                   
-## Perc_Alc    -0.02579   0.004560  -5.655           3.869e-08              2e-04
-## Perc_Decomp  0.01881   0.003313   5.677           3.447e-08              1e+00
-##             permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                        
-## Perc_Alc                 1e+00                2e-04
-## Perc_Decomp              2e-04                2e-04
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)  1.94758   0.166155  11.721           4.711e-26                                                           
+## Perc_Alc    -0.02579   0.004560  -5.655           3.869e-08              2e-04              1e+00                2e-04
+## Perc_Decomp  0.01881   0.003313   5.677           3.447e-08              1e+00              2e-04                2e-04
 ```
 
 ```r
@@ -2422,7 +1581,7 @@ perc_alc_plot <- trt_wide %>%
 perc_alc_plot
 ```
 
-![](figures/unnamed-chunk-38-1.png)<!-- -->
+![](figures/unnamed-chunk-102-1.png)<!-- -->
 
 ## Multicentre
 
@@ -2434,14 +1593,10 @@ permuco::lmperm(abschange ~ Centre + Perc_Decomp, data=trt_wide)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                      Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)          1.663139   0.165791  10.032           2.056e-20
-## CentreSingle-centre -0.544349   0.216320  -2.516           1.242e-02
-## Perc_Decomp          0.007055   0.002478   2.846           4.750e-03
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## CentreSingle-centre             0.0062              0.994               0.0136
-## Perc_Decomp                     0.9982              0.002               0.0040
+##                      Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          1.663139   0.165791  10.032           2.056e-20                                                           
+## CentreSingle-centre -0.544349   0.216320  -2.516           1.242e-02             0.0062              0.994               0.0136
+## Perc_Decomp          0.007055   0.002478   2.846           4.750e-03             0.9982              0.002               0.0040
 ```
 
 
@@ -2457,7 +1612,7 @@ centre_plot <- trt_wide %>%
 centre_plot
 ```
 
-![](figures/unnamed-chunk-40-1.png)<!-- -->
+![](figures/unnamed-chunk-104-1.png)<!-- -->
 
 
 ## Combined Model
@@ -2470,16 +1625,11 @@ permuco::lmperm(abschange ~ Perc_Decomp + Centre + Perc_Alc, data=trt_wide)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                     Estimate Std. Error  t value parametric Pr(>|t|)
-## (Intercept)          1.94534   0.168789 11.52527           2.287e-25
-## Perc_Decomp          0.01884   0.003349  5.62673           4.493e-08
-## CentreSingle-centre  0.01892   0.236163  0.08012           9.362e-01
-## Perc_Alc            -0.02599   0.005198 -4.99906           1.023e-06
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## Perc_Decomp                     1.0000             0.0002               0.0002
-## CentreSingle-centre             0.5338             0.4664               0.9270
-## Perc_Alc                        0.0002             1.0000               0.0002
+##                     Estimate Std. Error  t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          1.94534   0.168789 11.52527           2.287e-25                                                           
+## Perc_Decomp          0.01884   0.003349  5.62673           4.493e-08             1.0000             0.0002               0.0002
+## CentreSingle-centre  0.01892   0.236163  0.08012           9.362e-01             0.5338             0.4664               0.9270
+## Perc_Alc            -0.02599   0.005198 -4.99906           1.023e-06             0.0002             1.0000               0.0002
 ```
 
 ```r
@@ -2489,14 +1639,10 @@ permuco::lmperm(abschange ~ Centre + Perc_Alc, data=trt_wide_c)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                     Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)          1.99513   0.170383  11.710           3.636e-21
-## CentreSingle-centre -0.38265   0.310236  -1.233           2.200e-01
-## Perc_Alc            -0.01289   0.007501  -1.718           8.858e-02
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## CentreSingle-centre             0.1070             0.8932               0.2218
-## Perc_Alc                        0.0474             0.9528               0.0924
+##                     Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          1.99513   0.170383  11.710           3.636e-21                                                           
+## CentreSingle-centre -0.38265   0.310236  -1.233           2.200e-01             0.1070             0.8932               0.2218
+## Perc_Alc            -0.01289   0.007501  -1.718           8.858e-02             0.0474             0.9528               0.0924
 ```
 
 ```r
@@ -2506,14 +1652,10 @@ permuco::lmperm(abschange ~ Centre + Perc_Alc, data=trt_wide_dc)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                     Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)          2.99299   0.440666   6.792           1.967e-10
-## CentreSingle-centre  0.37572   0.372646   1.008           3.148e-01
-## Perc_Alc            -0.02274   0.008097  -2.808           5.587e-03
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## CentreSingle-centre             0.8450             0.1552               0.3112
-## Perc_Alc                        0.0066             0.9936               0.0078
+##                     Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          2.99299   0.440666   6.792           1.967e-10                                                           
+## CentreSingle-centre  0.37572   0.372646   1.008           3.148e-01             0.8450             0.1552               0.3112
+## Perc_Alc            -0.02274   0.008097  -2.808           5.587e-03             0.0066             0.9936               0.0078
 ```
 Let's examine why this might be.
 
@@ -2524,7 +1666,7 @@ trt_wide %>%
   geom_violin()
 ```
 
-![](figures/unnamed-chunk-42-1.png)<!-- -->
+![](figures/unnamed-chunk-106-1.png)<!-- -->
 
 ```r
 permTS(formula=Perc_Decomp ~ as.factor(Centre), data=trt_wide,
@@ -2556,7 +1698,7 @@ trt_wide %>%
   geom_violin()
 ```
 
-![](figures/unnamed-chunk-43-1.png)<!-- -->
+![](figures/unnamed-chunk-107-1.png)<!-- -->
 
 ```r
 permTS(formula=Perc_Alc ~ as.factor(Centre), data=trt_wide,
@@ -2592,18 +1734,12 @@ permuco::lmperm(abschange ~ Perc_Decomp + Centre + Perc_Alc + Days, data=trt_wid
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                       Estimate Std. Error  t value parametric Pr(>|t|)
-## (Intercept)          2.0833441  0.2090856  9.96407           3.545e-20
-## Perc_Decomp          0.0178489  0.0034640  5.15263           4.898e-07
-## CentreSingle-centre  0.0234628  0.2360917  0.09938           9.209e-01
-## Perc_Alc            -0.0262613  0.0052018 -5.04852           8.097e-07
-## Days                -0.0007942  0.0007107 -1.11745           2.648e-01
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## Perc_Decomp                     1.0000             0.0002               0.0002
-## CentreSingle-centre             0.5348             0.4654               0.9186
-## Perc_Alc                        0.0002             1.0000               0.0002
-## Days                            0.1308             0.8694               0.2550
+##                       Estimate Std. Error  t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          2.0833441  0.2090856  9.96407           3.545e-20                                                           
+## Perc_Decomp          0.0178489  0.0034640  5.15263           4.898e-07             1.0000             0.0002               0.0002
+## CentreSingle-centre  0.0234628  0.2360917  0.09938           9.209e-01             0.5348             0.4654               0.9186
+## Perc_Alc            -0.0262613  0.0052018 -5.04852           8.097e-07             0.0002             1.0000               0.0002
+## Days                -0.0007942  0.0007107 -1.11745           2.648e-01             0.1308             0.8694               0.2550
 ```
 This does not appear to be the case!
 
@@ -2620,14 +1756,10 @@ permuco::lmperm(abschange ~ meanval + Perc_Decomp, data=trt_wide)
 ```
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
-## (Intercept) 1.085870   0.422931   2.567             0.01077                   
-## meanval     0.025623   0.024418   1.049             0.29494             0.8470
-## Perc_Decomp 0.004602   0.002401   1.917             0.05630             0.9774
-##             permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                        
-## meanval                 0.1532                0.299
-## Perc_Decomp             0.0228                0.054
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept) 1.085870   0.422931   2.567             0.01077                                                           
+## meanval     0.025623   0.024418   1.049             0.29494             0.8470             0.1532                0.299
+## Perc_Decomp 0.004602   0.002401   1.917             0.05630             0.9774             0.0228                0.054
 ```
 
 ```r
@@ -2686,7 +1818,7 @@ meanv_abs_plot <- trt_wide %>%
 meanv_abs_plot
 ```
 
-![](figures/unnamed-chunk-46-1.png)<!-- -->
+![](figures/unnamed-chunk-110-1.png)<!-- -->
 
 
 ### Signed
@@ -2698,8 +1830,7 @@ summary(meanv_sign)
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + Perc_Decomp + (1 | Study)
 ##    Data: trt_wide
 ## 
@@ -2735,8 +1866,7 @@ summary(meanv_sign_nocorr)
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + (1 | Study)
 ##    Data: trt_wide
 ## 
@@ -2770,8 +1900,7 @@ summary(meanv_sign_c)
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + (1 | Study)
 ##    Data: trt_wide_c
 ## 
@@ -2805,8 +1934,7 @@ summary(meanv_sign_dc)
 ```
 
 ```
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + (1 | Study)
 ##    Data: trt_wide_dc
 ## 
@@ -2864,7 +1992,7 @@ meanv_signed_plot <- trt_wide %>%
 meanv_signed_plot
 ```
 
-![](figures/unnamed-chunk-48-1.png)<!-- -->
+![](figures/unnamed-chunk-112-1.png)<!-- -->
 
 
 
@@ -2879,7 +2007,7 @@ meanv_signed_plot_nocorr <- ggplot(data=trt_wide, aes(x=meanval, y=change)) +
 meanv_signed_plot_nocorr
 ```
 
-![](figures/unnamed-chunk-49-1.png)<!-- -->
+![](figures/unnamed-chunk-113-1.png)<!-- -->
 
 
 
@@ -2893,7 +2021,7 @@ cowplot::plot_grid(decomp_plot, days_plot,
                    ncol = 2, labels = "AUTO")
 ```
 
-![](figures/unnamed-chunk-50-1.png)<!-- -->
+![](figures/unnamed-chunk-114-1.png)<!-- -->
 
 
 ```r
@@ -2903,7 +2031,7 @@ cowplot::plot_grid(abs_change_distr, sign_change_distr,
                    ncol = 2, labels = "AUTO")
 ```
 
-![](figures/unnamed-chunk-51-1.png)<!-- -->
+![](figures/unnamed-chunk-115-1.png)<!-- -->
 
 
 
@@ -3010,7 +2138,7 @@ ggplot(effects, aes(x=PrePost, y=Outcome, colour=ID, group=ID)) +
   guides(colour=FALSE)
 ```
 
-![](figures/unnamed-chunk-52-1.png)<!-- -->
+![](figures/unnamed-chunk-116-1.png)<!-- -->
 
 So, to summarise, we have underlying true values, and measured values after accounting for measurement error.  The change from before to after the intervention can either be homogeneous (everyone has exactly the same effect), or heterogeneous (effect sizes differ, and some even get harmed by the intervention - about 2.5% as I've chosen the SD of the intervention effect as 50% of the mean effect, so 0 effect is 2 SDs away from the mean effect size, which is approximately 2.5%).  Then, the measured values appear to show more people getting worse after treatment, but this is just due to measurement error.
 
@@ -3052,7 +2180,7 @@ ggplot(heterogen_effects, aes(x=Effect)) +
                        "worsening."))
 ```
 
-![](figures/unnamed-chunk-53-1.png)<!-- -->
+![](figures/unnamed-chunk-117-1.png)<!-- -->
 
 This would imply that for all different sizes of effect, that only 2.3% experience a true worsening. However, when we measure the values, there are also several individuals who will exhibit an apparent worsening (increases from first to second measurement), when their true underlying values exhibited improvements. Let's calculate what fraction of individuals this would be.
 
@@ -3178,304 +2306,74 @@ knitr::kable(measured_percs_summary[,-1]) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(measured_percs_summary))
 ```
 
-<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:right;"> Difference </th>
-   <th style="text-align:left;"> Effects </th>
-   <th style="text-align:right;"> True Worsening (%) </th>
-   <th style="text-align:right;"> Apparent Worsening (%) </th>
-   <th style="text-align:right;"> True 10%+ Improvement (%) </th>
-   <th style="text-align:right;"> Apparent 10%+ Improvement (%) </th>
-   <th style="text-align:right;"> True 20%+ Improvement (%) </th>
-   <th style="text-align:right;"> Apparent 20%+ Improvement (%) </th>
-  </tr>
- </thead>
-<tbody>
-  <tr grouplength="14"><td colspan="8" style="border-bottom: 1px solid;"><strong>Includes Decompensated</strong></td></tr>
-<tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 24.8 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 8.7 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 24.8 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 8.7 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 42.5 </td>
-   <td style="text-align:right;"> 0.3 </td>
-   <td style="text-align:right;"> 31.4 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 12.2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 42.5 </td>
-   <td style="text-align:right;"> 0.8 </td>
-   <td style="text-align:right;"> 31.5 </td>
-   <td style="text-align:right;"> 0.1 </td>
-   <td style="text-align:right;"> 12.3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 35.2 </td>
-   <td style="text-align:right;"> 5.0 </td>
-   <td style="text-align:right;"> 38.7 </td>
-   <td style="text-align:right;"> 0.3 </td>
-   <td style="text-align:right;"> 16.6 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 35.4 </td>
-   <td style="text-align:right;"> 13.7 </td>
-   <td style="text-align:right;"> 38.9 </td>
-   <td style="text-align:right;"> 0.8 </td>
-   <td style="text-align:right;"> 17.1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 28.5 </td>
-   <td style="text-align:right;"> 30.1 </td>
-   <td style="text-align:right;"> 46.4 </td>
-   <td style="text-align:right;"> 1.3 </td>
-   <td style="text-align:right;"> 22.0 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 29.2 </td>
-   <td style="text-align:right;"> 39.5 </td>
-   <td style="text-align:right;"> 46.5 </td>
-   <td style="text-align:right;"> 4.5 </td>
-   <td style="text-align:right;"> 22.9 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 22.3 </td>
-   <td style="text-align:right;"> 72.7 </td>
-   <td style="text-align:right;"> 54.2 </td>
-   <td style="text-align:right;"> 5.0 </td>
-   <td style="text-align:right;"> 28.2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 23.8 </td>
-   <td style="text-align:right;"> 59.7 </td>
-   <td style="text-align:right;"> 53.9 </td>
-   <td style="text-align:right;"> 13.7 </td>
-   <td style="text-align:right;"> 29.6 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 17.1 </td>
-   <td style="text-align:right;"> 95.8 </td>
-   <td style="text-align:right;"> 61.9 </td>
-   <td style="text-align:right;"> 13.9 </td>
-   <td style="text-align:right;"> 35.3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 19.6 </td>
-   <td style="text-align:right;"> 71.9 </td>
-   <td style="text-align:right;"> 60.7 </td>
-   <td style="text-align:right;"> 26.5 </td>
-   <td style="text-align:right;"> 36.7 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 12.7 </td>
-   <td style="text-align:right;"> 99.8 </td>
-   <td style="text-align:right;"> 69.1 </td>
-   <td style="text-align:right;"> 30.1 </td>
-   <td style="text-align:right;"> 42.8 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 16.1 </td>
-   <td style="text-align:right;"> 79.1 </td>
-   <td style="text-align:right;"> 66.6 </td>
-   <td style="text-align:right;"> 39.5 </td>
-   <td style="text-align:right;"> 43.8 </td>
-  </tr>
-  <tr grouplength="14"><td colspan="8" style="border-bottom: 1px solid;"><strong>Only Compensated</strong></td></tr>
-<tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 21.9 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 6.0 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 50.0 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 21.9 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 6.0 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 40.9 </td>
-   <td style="text-align:right;"> 0.1 </td>
-   <td style="text-align:right;"> 29.5 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 9.3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 41.1 </td>
-   <td style="text-align:right;"> 0.4 </td>
-   <td style="text-align:right;"> 29.6 </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 9.5 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 32.4 </td>
-   <td style="text-align:right;"> 3.4 </td>
-   <td style="text-align:right;"> 38.1 </td>
-   <td style="text-align:right;"> 0.1 </td>
-   <td style="text-align:right;"> 13.9 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 32.8 </td>
-   <td style="text-align:right;"> 14.8 </td>
-   <td style="text-align:right;"> 38.4 </td>
-   <td style="text-align:right;"> 0.4 </td>
-   <td style="text-align:right;"> 14.6 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 24.7 </td>
-   <td style="text-align:right;"> 34.6 </td>
-   <td style="text-align:right;"> 47.4 </td>
-   <td style="text-align:right;"> 0.6 </td>
-   <td style="text-align:right;"> 19.9 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 25.8 </td>
-   <td style="text-align:right;"> 43.3 </td>
-   <td style="text-align:right;"> 47.5 </td>
-   <td style="text-align:right;"> 4.2 </td>
-   <td style="text-align:right;"> 21.3 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 18.1 </td>
-   <td style="text-align:right;"> 84.7 </td>
-   <td style="text-align:right;"> 56.8 </td>
-   <td style="text-align:right;"> 3.4 </td>
-   <td style="text-align:right;"> 27.2 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 20.3 </td>
-   <td style="text-align:right;"> 63.3 </td>
-   <td style="text-align:right;"> 56.1 </td>
-   <td style="text-align:right;"> 14.8 </td>
-   <td style="text-align:right;"> 29.1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 12.7 </td>
-   <td style="text-align:right;"> 99.3 </td>
-   <td style="text-align:right;"> 65.8 </td>
-   <td style="text-align:right;"> 13.4 </td>
-   <td style="text-align:right;"> 35.6 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 16.1 </td>
-   <td style="text-align:right;"> 74.6 </td>
-   <td style="text-align:right;"> 63.7 </td>
-   <td style="text-align:right;"> 29.4 </td>
-   <td style="text-align:right;"> 37.5 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Homogeneous </td>
-   <td style="text-align:right;"> 0.0 </td>
-   <td style="text-align:right;"> 8.5 </td>
-   <td style="text-align:right;"> 100.0 </td>
-   <td style="text-align:right;"> 74.0 </td>
-   <td style="text-align:right;"> 34.6 </td>
-   <td style="text-align:right;"> 44.7 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Heterogeneous </td>
-   <td style="text-align:right;"> 2.3 </td>
-   <td style="text-align:right;"> 12.9 </td>
-   <td style="text-align:right;"> 81.1 </td>
-   <td style="text-align:right;"> 70.0 </td>
-   <td style="text-align:right;"> 43.3 </td>
-   <td style="text-align:right;"> 45.7 </td>
-  </tr>
-</tbody>
-</table>
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l|r|r|r|r|r|r}
+\hline
+Difference & Effects & True Worsening (\%) & Apparent Worsening (\%) & True 10\%+ Improvement (\%) & Apparent 10\%+ Improvement (\%) & True 20\%+ Improvement (\%) & Apparent 20\%+ Improvement (\%)\\
+\hline
+\multicolumn{8}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}0.0 & Homogeneous & 0.0 & 50.0 & 0.0 & 24.8 & 0.0 & 8.7\\
+\hline
+\hspace{1em}0.0 & Heterogeneous & 0.0 & 50.0 & 0.0 & 24.8 & 0.0 & 8.7\\
+\hline
+\hspace{1em}0.5 & Homogeneous & 0.0 & 42.5 & 0.3 & 31.4 & 0.0 & 12.2\\
+\hline
+\hspace{1em}0.5 & Heterogeneous & 2.3 & 42.5 & 0.8 & 31.5 & 0.1 & 12.3\\
+\hline
+\hspace{1em}1.0 & Homogeneous & 0.0 & 35.2 & 5.0 & 38.7 & 0.3 & 16.6\\
+\hline
+\hspace{1em}1.0 & Heterogeneous & 2.3 & 35.4 & 13.7 & 38.9 & 0.8 & 17.1\\
+\hline
+\hspace{1em}1.5 & Homogeneous & 0.0 & 28.5 & 30.1 & 46.4 & 1.3 & 22.0\\
+\hline
+\hspace{1em}1.5 & Heterogeneous & 2.3 & 29.2 & 39.5 & 46.5 & 4.5 & 22.9\\
+\hline
+\hspace{1em}2.0 & Homogeneous & 0.0 & 22.3 & 72.7 & 54.2 & 5.0 & 28.2\\
+\hline
+\hspace{1em}2.0 & Heterogeneous & 2.3 & 23.8 & 59.7 & 53.9 & 13.7 & 29.6\\
+\hline
+\hspace{1em}2.5 & Homogeneous & 0.0 & 17.1 & 95.8 & 61.9 & 13.9 & 35.3\\
+\hline
+\hspace{1em}2.5 & Heterogeneous & 2.3 & 19.6 & 71.9 & 60.7 & 26.5 & 36.7\\
+\hline
+\hspace{1em}3.0 & Homogeneous & 0.0 & 12.7 & 99.8 & 69.1 & 30.1 & 42.8\\
+\hline
+\hspace{1em}3.0 & Heterogeneous & 2.3 & 16.1 & 79.1 & 66.6 & 39.5 & 43.8\\
+\hline
+\multicolumn{8}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}0.0 & Homogeneous & 0.0 & 50.0 & 0.0 & 21.9 & 0.0 & 6.0\\
+\hline
+\hspace{1em}0.0 & Heterogeneous & 0.0 & 50.0 & 0.0 & 21.9 & 0.0 & 6.0\\
+\hline
+\hspace{1em}0.5 & Homogeneous & 0.0 & 40.9 & 0.1 & 29.5 & 0.0 & 9.3\\
+\hline
+\hspace{1em}0.5 & Heterogeneous & 2.3 & 41.1 & 0.4 & 29.6 & 0.0 & 9.5\\
+\hline
+\hspace{1em}1.0 & Homogeneous & 0.0 & 32.4 & 3.4 & 38.1 & 0.1 & 13.9\\
+\hline
+\hspace{1em}1.0 & Heterogeneous & 2.3 & 32.8 & 14.8 & 38.4 & 0.4 & 14.6\\
+\hline
+\hspace{1em}1.5 & Homogeneous & 0.0 & 24.7 & 34.6 & 47.4 & 0.6 & 19.9\\
+\hline
+\hspace{1em}1.5 & Heterogeneous & 2.3 & 25.8 & 43.3 & 47.5 & 4.2 & 21.3\\
+\hline
+\hspace{1em}2.0 & Homogeneous & 0.0 & 18.1 & 84.7 & 56.8 & 3.4 & 27.2\\
+\hline
+\hspace{1em}2.0 & Heterogeneous & 2.3 & 20.3 & 63.3 & 56.1 & 14.8 & 29.1\\
+\hline
+\hspace{1em}2.5 & Homogeneous & 0.0 & 12.7 & 99.3 & 65.8 & 13.4 & 35.6\\
+\hline
+\hspace{1em}2.5 & Heterogeneous & 2.3 & 16.1 & 74.6 & 63.7 & 29.4 & 37.5\\
+\hline
+\hspace{1em}3.0 & Homogeneous & 0.0 & 8.5 & 100.0 & 74.0 & 34.6 & 44.7\\
+\hline
+\hspace{1em}3.0 & Heterogeneous & 2.3 & 12.9 & 81.1 & 70.0 & 43.3 & 45.7\\
+\hline
+\end{tabular}
+\end{table}
 
 ```r
 appchange <- knitr::kable(measured_percs_summary[,-1]) %>% 
@@ -3483,13 +2381,88 @@ appchange <- knitr::kable(measured_percs_summary[,-1]) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(measured_percs_summary))
 
-save_kable(appchange, file = "figures/appchange.jpg")
+appchange
+```
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l|r|r|r|r|r|r}
+\hline
+Difference & Effects & True Worsening (\%) & Apparent Worsening (\%) & True 10\%+ Improvement (\%) & Apparent 10\%+ Improvement (\%) & True 20\%+ Improvement (\%) & Apparent 20\%+ Improvement (\%)\\
+\hline
+\multicolumn{8}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}0.0 & Homogeneous & 0.0 & 50.0 & 0.0 & 24.8 & 0.0 & 8.7\\
+\hline
+\hspace{1em}0.0 & Heterogeneous & 0.0 & 50.0 & 0.0 & 24.8 & 0.0 & 8.7\\
+\hline
+\hspace{1em}0.5 & Homogeneous & 0.0 & 42.5 & 0.3 & 31.4 & 0.0 & 12.2\\
+\hline
+\hspace{1em}0.5 & Heterogeneous & 2.3 & 42.5 & 0.8 & 31.5 & 0.1 & 12.3\\
+\hline
+\hspace{1em}1.0 & Homogeneous & 0.0 & 35.2 & 5.0 & 38.7 & 0.3 & 16.6\\
+\hline
+\hspace{1em}1.0 & Heterogeneous & 2.3 & 35.4 & 13.7 & 38.9 & 0.8 & 17.1\\
+\hline
+\hspace{1em}1.5 & Homogeneous & 0.0 & 28.5 & 30.1 & 46.4 & 1.3 & 22.0\\
+\hline
+\hspace{1em}1.5 & Heterogeneous & 2.3 & 29.2 & 39.5 & 46.5 & 4.5 & 22.9\\
+\hline
+\hspace{1em}2.0 & Homogeneous & 0.0 & 22.3 & 72.7 & 54.2 & 5.0 & 28.2\\
+\hline
+\hspace{1em}2.0 & Heterogeneous & 2.3 & 23.8 & 59.7 & 53.9 & 13.7 & 29.6\\
+\hline
+\hspace{1em}2.5 & Homogeneous & 0.0 & 17.1 & 95.8 & 61.9 & 13.9 & 35.3\\
+\hline
+\hspace{1em}2.5 & Heterogeneous & 2.3 & 19.6 & 71.9 & 60.7 & 26.5 & 36.7\\
+\hline
+\hspace{1em}3.0 & Homogeneous & 0.0 & 12.7 & 99.8 & 69.1 & 30.1 & 42.8\\
+\hline
+\hspace{1em}3.0 & Heterogeneous & 2.3 & 16.1 & 79.1 & 66.6 & 39.5 & 43.8\\
+\hline
+\multicolumn{8}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}0.0 & Homogeneous & 0.0 & 50.0 & 0.0 & 21.9 & 0.0 & 6.0\\
+\hline
+\hspace{1em}0.0 & Heterogeneous & 0.0 & 50.0 & 0.0 & 21.9 & 0.0 & 6.0\\
+\hline
+\hspace{1em}0.5 & Homogeneous & 0.0 & 40.9 & 0.1 & 29.5 & 0.0 & 9.3\\
+\hline
+\hspace{1em}0.5 & Heterogeneous & 2.3 & 41.1 & 0.4 & 29.6 & 0.0 & 9.5\\
+\hline
+\hspace{1em}1.0 & Homogeneous & 0.0 & 32.4 & 3.4 & 38.1 & 0.1 & 13.9\\
+\hline
+\hspace{1em}1.0 & Heterogeneous & 2.3 & 32.8 & 14.8 & 38.4 & 0.4 & 14.6\\
+\hline
+\hspace{1em}1.5 & Homogeneous & 0.0 & 24.7 & 34.6 & 47.4 & 0.6 & 19.9\\
+\hline
+\hspace{1em}1.5 & Heterogeneous & 2.3 & 25.8 & 43.3 & 47.5 & 4.2 & 21.3\\
+\hline
+\hspace{1em}2.0 & Homogeneous & 0.0 & 18.1 & 84.7 & 56.8 & 3.4 & 27.2\\
+\hline
+\hspace{1em}2.0 & Heterogeneous & 2.3 & 20.3 & 63.3 & 56.1 & 14.8 & 29.1\\
+\hline
+\hspace{1em}2.5 & Homogeneous & 0.0 & 12.7 & 99.3 & 65.8 & 13.4 & 35.6\\
+\hline
+\hspace{1em}2.5 & Heterogeneous & 2.3 & 16.1 & 74.6 & 63.7 & 29.4 & 37.5\\
+\hline
+\hspace{1em}3.0 & Homogeneous & 0.0 & 8.5 & 100.0 & 74.0 & 34.6 & 44.7\\
+\hline
+\hspace{1em}3.0 & Heterogeneous & 2.3 & 12.9 & 81.1 & 70.0 & 43.3 & 45.7\\
+\hline
+\end{tabular}
+\end{table}
+
+```r
+# save_kable(appchange, file = "figures/appchange.jpg")
 ```
 
 So, for a true effect of about 2mmHg in compensated patients, it will appear as if 12-16% would appear to worsen.  This fits with clinical experience.
 
 
 ## Simulation
+
+Note: these are no longer run as we instead make use of the analytical solutions
 
 
 ```r
@@ -3655,8 +2628,6 @@ ggplot(difsims_res, aes(x=n, y=power, colour=delta)) +
        colour="Intervention\nEffect (mmHg)")
 ```
 
-![](figures/unnamed-chunk-61-1.png)<!-- -->
-
 ## Required Individuals
 
 And how many people do we need for each scenario?
@@ -3692,215 +2663,15 @@ decomp_change <- head(
     difsims_power$Patients ==
       trt_all$decomp[2]), 1)
 
-kable(difsims_power[,-1]) %>% 
-  kable_styling("striped", full_width = F) %>%
-  pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
-  pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_80power))
+# kable(difsims_power[,-1]) %>% 
+#   kable_styling("striped", full_width = F) %>%
+#   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
+#   pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_80power))
 ```
-
-<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Difference (mmHg) </th>
-   <th style="text-align:left;"> Effects </th>
-   <th style="text-align:right;"> 80% Power </th>
-   <th style="text-align:right;"> 90% Power </th>
-  </tr>
- </thead>
-<tbody>
-  <tr grouplength="10"><td colspan="4" style="border-bottom: 1px solid;"><strong>Includes Decompensated</strong></td></tr>
-<tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 55 </td>
-   <td style="text-align:right;"> 75 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 60 </td>
-   <td style="text-align:right;"> 80 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 25 </td>
-   <td style="text-align:right;"> 35 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 30 </td>
-   <td style="text-align:right;"> 40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:right;"> 25 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 15 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 10 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 15 </td>
-  </tr>
-  <tr grouplength="10"><td colspan="4" style="border-bottom: 1px solid;"><strong>Only Compensated</strong></td></tr>
-<tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 30 </td>
-   <td style="text-align:right;"> 40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 30 </td>
-   <td style="text-align:right;"> 40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 15 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 15 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 10 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 10 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 10 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 10 </td>
-  </tr>
-</tbody>
-</table>
 
 
 ## Analytical solution
 
-Let's compare these with the analytical solution
-
-* Decomp
-* Homogeneous
-* 1.5
-
-* Expect: 20 < n < 25
-
-
-
-```r
-library(pwr)
-
-dz <- 1.5/(trt_all$signvar_sd[1]*trt_all$mean[1])
-
-pwr::pwr.t.test(d=dz, sig.level = 0.05, power = 0.8, 
-                type = "paired", alternative = "greater")
-```
-
-```
-## 
-##      Paired t test power calculation 
-## 
-##               n = 20.45661
-##               d = 0.5699301
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = greater
-## 
-## NOTE: n is number of *pairs*
-```
-
-And hetero
-
-* Decomp
-* Homogeneous
-* 1.5
-
-* Expect: 25 < n < 30
-
-
-```r
-signvar_sd <- sqrt(
-    (trt_all$signvar_sd[1]*trt_all$mean[1])^2 +
-    (0.5*1.5)^2)
-  
-
-dz <- 1.5/signvar_sd
-
-pwr::pwr.t.test(d=dz, sig.level = 0.05, power = 0.8, 
-                type = "paired", alternative = "greater")
-```
-
-```
-## 
-##      Paired t test power calculation 
-## 
-##               n = 21.99721
-##               d = 0.5481097
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = greater
-## 
-## NOTE: n is number of *pairs*
-```
 
 
 ```r
@@ -3946,140 +2717,58 @@ kable(difsims_power_ana[,-1]) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_power_ana))
 ```
 
-<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:right;"> Difference </th>
-   <th style="text-align:left;"> Effects </th>
-   <th style="text-align:right;"> 80% Power </th>
-   <th style="text-align:right;"> 90% Power </th>
-  </tr>
- </thead>
-<tbody>
-  <tr grouplength="10"><td colspan="4" style="border-bottom: 1px solid;"><strong>Includes Decompensated</strong></td></tr>
-<tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 45 </td>
-   <td style="text-align:right;"> 61 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 46 </td>
-   <td style="text-align:right;"> 63 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 21 </td>
-   <td style="text-align:right;"> 28 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 22 </td>
-   <td style="text-align:right;"> 30 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 13 </td>
-   <td style="text-align:right;"> 17 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 14 </td>
-   <td style="text-align:right;"> 19 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 9 </td>
-   <td style="text-align:right;"> 11 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 14 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 9 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 11 </td>
-  </tr>
-  <tr grouplength="10"><td colspan="4" style="border-bottom: 1px solid;"><strong>Only Compensated</strong></td></tr>
-<tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 32 </td>
-   <td style="text-align:right;"> 43 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 33 </td>
-   <td style="text-align:right;"> 45 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 17 </td>
-   <td style="text-align:right;"> 22 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 9 </td>
-   <td style="text-align:right;"> 12 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 11 </td>
-   <td style="text-align:right;"> 14 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 9 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:right;"> 11 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 5 </td>
-   <td style="text-align:right;"> 7 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right; padding-left:  2em;" indentlevel="1"> 3.0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 9 </td>
-  </tr>
-</tbody>
-</table>
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l|r|r}
+\hline
+Difference & Effects & 80\% Power & 90\% Power\\
+\hline
+\multicolumn{4}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}1.0 & Homogeneous Effects & 45 & 61\\
+\hline
+\hspace{1em}1.0 & Heterogeneous Effects & 46 & 63\\
+\hline
+\hspace{1em}1.5 & Homogeneous Effects & 21 & 28\\
+\hline
+\hspace{1em}1.5 & Heterogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}2.0 & Homogeneous Effects & 13 & 17\\
+\hline
+\hspace{1em}2.0 & Heterogeneous Effects & 14 & 19\\
+\hline
+\hspace{1em}2.5 & Homogeneous Effects & 9 & 11\\
+\hline
+\hspace{1em}2.5 & Heterogeneous Effects & 10 & 14\\
+\hline
+\hspace{1em}3.0 & Homogeneous Effects & 7 & 9\\
+\hline
+\hspace{1em}3.0 & Heterogeneous Effects & 8 & 11\\
+\hline
+\multicolumn{4}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}1.0 & Homogeneous Effects & 32 & 43\\
+\hline
+\hspace{1em}1.0 & Heterogeneous Effects & 33 & 45\\
+\hline
+\hspace{1em}1.5 & Homogeneous Effects & 15 & 20\\
+\hline
+\hspace{1em}1.5 & Heterogeneous Effects & 17 & 22\\
+\hline
+\hspace{1em}2.0 & Homogeneous Effects & 9 & 12\\
+\hline
+\hspace{1em}2.0 & Heterogeneous Effects & 11 & 14\\
+\hline
+\hspace{1em}2.5 & Homogeneous Effects & 7 & 9\\
+\hline
+\hspace{1em}2.5 & Heterogeneous Effects & 8 & 11\\
+\hline
+\hspace{1em}3.0 & Homogeneous Effects & 5 & 7\\
+\hline
+\hspace{1em}3.0 & Heterogeneous Effects & 7 & 9\\
+\hline
+\end{tabular}
+\end{table}
 
 ```r
 difpower <- kable(difsims_power_ana[,-1]) %>% 
@@ -4087,7 +2776,64 @@ difpower <- kable(difsims_power_ana[,-1]) %>%
   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_power_ana))
 
-save_kable(difpower, "figures/difpower.jpg")
+difpower
+```
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l|r|r}
+\hline
+Difference & Effects & 80\% Power & 90\% Power\\
+\hline
+\multicolumn{4}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}1.0 & Homogeneous Effects & 45 & 61\\
+\hline
+\hspace{1em}1.0 & Heterogeneous Effects & 46 & 63\\
+\hline
+\hspace{1em}1.5 & Homogeneous Effects & 21 & 28\\
+\hline
+\hspace{1em}1.5 & Heterogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}2.0 & Homogeneous Effects & 13 & 17\\
+\hline
+\hspace{1em}2.0 & Heterogeneous Effects & 14 & 19\\
+\hline
+\hspace{1em}2.5 & Homogeneous Effects & 9 & 11\\
+\hline
+\hspace{1em}2.5 & Heterogeneous Effects & 10 & 14\\
+\hline
+\hspace{1em}3.0 & Homogeneous Effects & 7 & 9\\
+\hline
+\hspace{1em}3.0 & Heterogeneous Effects & 8 & 11\\
+\hline
+\multicolumn{4}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}1.0 & Homogeneous Effects & 32 & 43\\
+\hline
+\hspace{1em}1.0 & Heterogeneous Effects & 33 & 45\\
+\hline
+\hspace{1em}1.5 & Homogeneous Effects & 15 & 20\\
+\hline
+\hspace{1em}1.5 & Heterogeneous Effects & 17 & 22\\
+\hline
+\hspace{1em}2.0 & Homogeneous Effects & 9 & 12\\
+\hline
+\hspace{1em}2.0 & Heterogeneous Effects & 11 & 14\\
+\hline
+\hspace{1em}2.5 & Homogeneous Effects & 7 & 9\\
+\hline
+\hspace{1em}2.5 & Heterogeneous Effects & 8 & 11\\
+\hline
+\hspace{1em}3.0 & Homogeneous Effects & 5 & 7\\
+\hline
+\hspace{1em}3.0 & Heterogeneous Effects & 7 & 9\\
+\hline
+\end{tabular}
+\end{table}
+
+```r
+# save_kable(difpower, "figures/difpower.jpg")
 ```
 
 
@@ -4185,13 +2931,13 @@ hetplot <- ggplot(contour_het, aes(x=n, y=Difference, z=Power)) +
 homplot
 ```
 
-![](figures/unnamed-chunk-68-1.png)<!-- -->
+![](figures/unnamed-chunk-130-1.png)<!-- -->
 
 ```r
 hetplot
 ```
 
-![](figures/unnamed-chunk-68-2.png)<!-- -->
+![](figures/unnamed-chunk-130-2.png)<!-- -->
 
 ```r
 ggsave(homplot, height=5, width=10, filename = "figures/Dif_hom_contour.png")
@@ -4486,7 +3232,7 @@ difindifplot <- cowplot::plot_grid(
 difindifplot
 ```
 
-![](figures/unnamed-chunk-76-1.png)<!-- -->
+![](figures/unnamed-chunk-138-1.png)<!-- -->
 
 ## Required Individuals
 
@@ -4537,502 +3283,138 @@ kable(difindifsims_power[,-1]) %>%
   pack_rows(trt_all$decomp[2], decomp_change, nrow(difindifsims_power))
 ```
 
-<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Difference (mmHg) </th>
-   <th style="text-align:left;"> Intervention 1 Effect (mmHg) </th>
-   <th style="text-align:left;"> Intervention 2 Effect (mmHg) </th>
-   <th style="text-align:left;"> Effects </th>
-   <th style="text-align:right;"> 80% Power </th>
-   <th style="text-align:left;"> 90% Power </th>
-  </tr>
- </thead>
-<tbody>
-  <tr grouplength="30"><td colspan="6" style="border-bottom: 1px solid;"><strong>Includes Decompensated</strong></td></tr>
-<tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:left;"> 16 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:left;"> 14 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:left;"> 22 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> 22 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 14 </td>
-   <td style="text-align:left;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:left;"> 36 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 22 </td>
-   <td style="text-align:left;"> 30 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 24 </td>
-   <td style="text-align:left;"> 34 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 22 </td>
-   <td style="text-align:left;"> 30 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 24 </td>
-   <td style="text-align:left;"> 32 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 22 </td>
-   <td style="text-align:left;"> 30 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 46 </td>
-   <td style="text-align:left;"> 62 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:left;"> 50 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 42 </td>
-   <td style="text-align:left;"> 58 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:left;"> 52 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 40 </td>
-   <td style="text-align:left;"> 56 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:left;"> 52 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:left;"> 52 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:left;"> 50 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 102 </td>
-   <td style="text-align:left;"> 140 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 82 </td>
-   <td style="text-align:left;"> 112 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 94 </td>
-   <td style="text-align:left;"> 132 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 82 </td>
-   <td style="text-align:left;"> 110 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 88 </td>
-   <td style="text-align:left;"> 124 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 80 </td>
-   <td style="text-align:left;"> 114 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 86 </td>
-   <td style="text-align:left;"> 118 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 82 </td>
-   <td style="text-align:left;"> 112 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 82 </td>
-   <td style="text-align:left;"> 116 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 80 </td>
-   <td style="text-align:left;"> 112 </td>
-  </tr>
-  <tr grouplength="30"><td colspan="6" style="border-bottom: 1px solid;"><strong>Only Compensated</strong></td></tr>
-<tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:left;"> 12 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 3 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 8 </td>
-   <td style="text-align:left;"> 10 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 14 </td>
-   <td style="text-align:left;"> 18 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:left;"> 14 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:left;"> 16 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 12 </td>
-   <td style="text-align:left;"> 14 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:left;"> 26 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> 20 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:left;"> 24 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> 22 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 18 </td>
-   <td style="text-align:left;"> 24 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 2 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 16 </td>
-   <td style="text-align:left;"> 22 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 34 </td>
-   <td style="text-align:left;"> 46 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:left;"> 36 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 32 </td>
-   <td style="text-align:left;"> 42 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:left;"> 36 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 30 </td>
-   <td style="text-align:left;"> 40 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:left;"> 36 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 28 </td>
-   <td style="text-align:left;"> 38 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:left;"> 36 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 76 </td>
-   <td style="text-align:left;"> 104 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 3 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 56 </td>
-   <td style="text-align:left;"> 78 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 70 </td>
-   <td style="text-align:left;"> 94 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2.5 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 56 </td>
-   <td style="text-align:left;"> 78 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 64 </td>
-   <td style="text-align:left;"> 88 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 2 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 58 </td>
-   <td style="text-align:left;"> 76 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 60 </td>
-   <td style="text-align:left;"> 84 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1.5 </td>
-   <td style="text-align:left;"> 0.5 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 56 </td>
-   <td style="text-align:left;"> 78 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Heterogeneous Effects </td>
-   <td style="text-align:right;"> 60 </td>
-   <td style="text-align:left;"> 80 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left:  2em;" indentlevel="1"> 1 </td>
-   <td style="text-align:left;"> 1 </td>
-   <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> Homogeneous Effects </td>
-   <td style="text-align:right;"> 58 </td>
-   <td style="text-align:left;"> 78 </td>
-  </tr>
-</tbody>
-</table>
+\begin{table}[H]
+\centering
+\begin{tabular}{l|l|l|l|r|l}
+\hline
+Difference (mmHg) & Intervention 1 Effect (mmHg) & Intervention 2 Effect (mmHg) & Effects & 80\% Power & 90\% Power\\
+\hline
+\multicolumn{6}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}3 & 3 & 0 & Heterogeneous Effects & 12 & 16\\
+\hline
+\hspace{1em}3 & 3 & 0 & Homogeneous Effects & 12 & 14\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Heterogeneous Effects & 18 & 22\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Homogeneous Effects & 16 & 20\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Heterogeneous Effects & 16 & 22\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Homogeneous Effects & 14 & 20\\
+\hline
+\hspace{1em}2 & 3 & 1 & Heterogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}2 & 3 & 1 & Homogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Heterogeneous Effects & 24 & 34\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Homogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}2 & 2 & 0 & Heterogeneous Effects & 24 & 32\\
+\hline
+\hspace{1em}2 & 2 & 0 & Homogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Heterogeneous Effects & 46 & 62\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Homogeneous Effects & 38 & 50\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Heterogeneous Effects & 42 & 58\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Homogeneous Effects & 38 & 52\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Heterogeneous Effects & 40 & 56\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Homogeneous Effects & 38 & 52\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Heterogeneous Effects & 38 & 52\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Homogeneous Effects & 38 & 50\\
+\hline
+\hspace{1em}1 & 3 & 2 & Heterogeneous Effects & 102 & 140\\
+\hline
+\hspace{1em}1 & 3 & 2 & Homogeneous Effects & 82 & 112\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Heterogeneous Effects & 94 & 132\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Homogeneous Effects & 82 & 110\\
+\hline
+\hspace{1em}1 & 2 & 1 & Heterogeneous Effects & 88 & 124\\
+\hline
+\hspace{1em}1 & 2 & 1 & Homogeneous Effects & 80 & 114\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Heterogeneous Effects & 86 & 118\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Homogeneous Effects & 82 & 112\\
+\hline
+\hspace{1em}1 & 1 & 0 & Heterogeneous Effects & 82 & 116\\
+\hline
+\hspace{1em}1 & 1 & 0 & Homogeneous Effects & 80 & 112\\
+\hline
+\multicolumn{6}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}3 & 3 & 0 & Heterogeneous Effects & 10 & 12\\
+\hline
+\hspace{1em}3 & 3 & 0 & Homogeneous Effects & 8 & 10\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Heterogeneous Effects & 14 & 18\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Homogeneous Effects & 10 & 14\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Heterogeneous Effects & 12 & 16\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Homogeneous Effects & 12 & 14\\
+\hline
+\hspace{1em}2 & 3 & 1 & Heterogeneous Effects & 20 & 26\\
+\hline
+\hspace{1em}2 & 3 & 1 & Homogeneous Effects & 16 & 20\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Heterogeneous Effects & 18 & 24\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Homogeneous Effects & 16 & 22\\
+\hline
+\hspace{1em}2 & 2 & 0 & Heterogeneous Effects & 18 & 24\\
+\hline
+\hspace{1em}2 & 2 & 0 & Homogeneous Effects & 16 & 22\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Heterogeneous Effects & 34 & 46\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Heterogeneous Effects & 32 & 42\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Heterogeneous Effects & 30 & 40\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Heterogeneous Effects & 28 & 38\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1 & 3 & 2 & Heterogeneous Effects & 76 & 104\\
+\hline
+\hspace{1em}1 & 3 & 2 & Homogeneous Effects & 56 & 78\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Heterogeneous Effects & 70 & 94\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Homogeneous Effects & 56 & 78\\
+\hline
+\hspace{1em}1 & 2 & 1 & Heterogeneous Effects & 64 & 88\\
+\hline
+\hspace{1em}1 & 2 & 1 & Homogeneous Effects & 58 & 76\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Heterogeneous Effects & 60 & 84\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Homogeneous Effects & 56 & 78\\
+\hline
+\hspace{1em}1 & 1 & 0 & Heterogeneous Effects & 60 & 80\\
+\hline
+\hspace{1em}1 & 1 & 0 & Homogeneous Effects & 58 & 78\\
+\hline
+\end{tabular}
+\end{table}
 
 ```r
 difindiftable_decomp <- difindifsims_power %>% 
@@ -5051,8 +3433,158 @@ difindiftable_comp <- difindifsims_power %>%
   kable_styling("striped", full_width = F) %>%
   pack_rows("Only Compensated", 1, decomp_change-1)
 
-save_kable(difindiftable_decomp, "figures/difindifpower_dc.jpg")
-save_kable(difindiftable_comp, "figures/difindifpower_c.jpg")
+difindiftable_decomp
+```
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l|l|l|l|r|l}
+\hline
+Difference (mmHg) & Intervention 1 Effect (mmHg) & Intervention 2 Effect (mmHg) & Effects & 80\% Power & 90\% Power\\
+\hline
+\multicolumn{6}{l}{\textbf{Includes Decompensated}}\\
+\hline
+\hspace{1em}3 & 3 & 0 & Heterogeneous Effects & 12 & 16\\
+\hline
+\hspace{1em}3 & 3 & 0 & Homogeneous Effects & 12 & 14\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Heterogeneous Effects & 18 & 22\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Homogeneous Effects & 16 & 20\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Heterogeneous Effects & 16 & 22\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Homogeneous Effects & 14 & 20\\
+\hline
+\hspace{1em}2 & 3 & 1 & Heterogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}2 & 3 & 1 & Homogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Heterogeneous Effects & 24 & 34\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Homogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}2 & 2 & 0 & Heterogeneous Effects & 24 & 32\\
+\hline
+\hspace{1em}2 & 2 & 0 & Homogeneous Effects & 22 & 30\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Heterogeneous Effects & 46 & 62\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Homogeneous Effects & 38 & 50\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Heterogeneous Effects & 42 & 58\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Homogeneous Effects & 38 & 52\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Heterogeneous Effects & 40 & 56\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Homogeneous Effects & 38 & 52\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Heterogeneous Effects & 38 & 52\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Homogeneous Effects & 38 & 50\\
+\hline
+\hspace{1em}1 & 3 & 2 & Heterogeneous Effects & 102 & 140\\
+\hline
+\hspace{1em}1 & 3 & 2 & Homogeneous Effects & 82 & 112\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Heterogeneous Effects & 94 & 132\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Homogeneous Effects & 82 & 110\\
+\hline
+\hspace{1em}1 & 2 & 1 & Heterogeneous Effects & 88 & 124\\
+\hline
+\hspace{1em}1 & 2 & 1 & Homogeneous Effects & 80 & 114\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Heterogeneous Effects & 86 & 118\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Homogeneous Effects & 82 & 112\\
+\hline
+\hspace{1em}1 & 1 & 0 & Heterogeneous Effects & 82 & 116\\
+\hline
+\hspace{1em}1 & 1 & 0 & Homogeneous Effects & 80 & 112\\
+\hline
+\end{tabular}
+\end{table}
+
+```r
+difindiftable_comp
+```
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l|l|l|l|r|l}
+\hline
+Difference (mmHg) & Intervention 1 Effect (mmHg) & Intervention 2 Effect (mmHg) & Effects & 80\% Power & 90\% Power\\
+\hline
+\multicolumn{6}{l}{\textbf{Only Compensated}}\\
+\hline
+\hspace{1em}3 & 3 & 0 & Heterogeneous Effects & 10 & 12\\
+\hline
+\hspace{1em}3 & 3 & 0 & Homogeneous Effects & 8 & 10\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Heterogeneous Effects & 14 & 18\\
+\hline
+\hspace{1em}2.5 & 3 & 0.5 & Homogeneous Effects & 10 & 14\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Heterogeneous Effects & 12 & 16\\
+\hline
+\hspace{1em}2.5 & 2.5 & 0 & Homogeneous Effects & 12 & 14\\
+\hline
+\hspace{1em}2 & 3 & 1 & Heterogeneous Effects & 20 & 26\\
+\hline
+\hspace{1em}2 & 3 & 1 & Homogeneous Effects & 16 & 20\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Heterogeneous Effects & 18 & 24\\
+\hline
+\hspace{1em}2 & 2.5 & 0.5 & Homogeneous Effects & 16 & 22\\
+\hline
+\hspace{1em}2 & 2 & 0 & Heterogeneous Effects & 18 & 24\\
+\hline
+\hspace{1em}2 & 2 & 0 & Homogeneous Effects & 16 & 22\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Heterogeneous Effects & 34 & 46\\
+\hline
+\hspace{1em}1.5 & 3 & 1.5 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Heterogeneous Effects & 32 & 42\\
+\hline
+\hspace{1em}1.5 & 2.5 & 1 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Heterogeneous Effects & 30 & 40\\
+\hline
+\hspace{1em}1.5 & 2 & 0.5 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Heterogeneous Effects & 28 & 38\\
+\hline
+\hspace{1em}1.5 & 1.5 & 0 & Homogeneous Effects & 26 & 36\\
+\hline
+\hspace{1em}1 & 3 & 2 & Heterogeneous Effects & 76 & 104\\
+\hline
+\hspace{1em}1 & 3 & 2 & Homogeneous Effects & 56 & 78\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Heterogeneous Effects & 70 & 94\\
+\hline
+\hspace{1em}1 & 2.5 & 1.5 & Homogeneous Effects & 56 & 78\\
+\hline
+\hspace{1em}1 & 2 & 1 & Heterogeneous Effects & 64 & 88\\
+\hline
+\hspace{1em}1 & 2 & 1 & Homogeneous Effects & 58 & 76\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Heterogeneous Effects & 60 & 84\\
+\hline
+\hspace{1em}1 & 1.5 & 0.5 & Homogeneous Effects & 56 & 78\\
+\hline
+\hspace{1em}1 & 1 & 0 & Heterogeneous Effects & 60 & 80\\
+\hline
+\hspace{1em}1 & 1 & 0 & Homogeneous Effects & 58 & 78\\
+\hline
+\end{tabular}
+\end{table}
+
+```r
+# save_kable(difindiftable_decomp, "figures/difindifpower_dc.jpg")
+# save_kable(difindiftable_comp, "figures/difindifpower_c.jpg")
 ```
 
 
@@ -5093,7 +3625,7 @@ difindif_cont1_hom <- difindifsims_res_hom %>%
 difindif_cont1_hom
 ```
 
-![](figures/unnamed-chunk-78-1.png)<!-- -->
+![](figures/unnamed-chunk-140-1.png)<!-- -->
 
 ```r
 difindif_cont1_het <- difindifsims_res_het %>% 
@@ -5112,7 +3644,7 @@ difindif_cont1_het <- difindifsims_res_het %>%
 difindif_cont1_het
 ```
 
-![](figures/unnamed-chunk-78-2.png)<!-- -->
+![](figures/unnamed-chunk-140-2.png)<!-- -->
 This is helpful to visualise, though probably not for the paper. With homogeneous effects, the determinant of the power is the difference in intervention effects; it's a straight line. With heterogeneous effects, the line is not straight
 
 
@@ -5132,7 +3664,7 @@ difindif_cont2_hom <- ggplot(difindifsims_res_hom, aes(x=n, y=delta1, z=power)) 
 difindif_cont2_hom
 ```
 
-![](figures/unnamed-chunk-79-1.png)<!-- -->
+![](figures/unnamed-chunk-141-1.png)<!-- -->
 
 ```r
 difindif_cont2_het <- ggplot(difindifsims_res_het, aes(x=n, y=delta1, z=power)) +
@@ -5149,7 +3681,7 @@ difindif_cont2_het <- ggplot(difindifsims_res_het, aes(x=n, y=delta1, z=power)) 
 difindif_cont2_het
 ```
 
-![](figures/unnamed-chunk-79-2.png)<!-- -->
+![](figures/unnamed-chunk-141-2.png)<!-- -->
 
 And just looking against placebo (i.e. delta2=0)
 
@@ -5172,7 +3704,7 @@ difindif_cont3_hom <- difindifsims_res_hom %>%
 difindif_cont3_hom
 ```
 
-![](figures/unnamed-chunk-80-1.png)<!-- -->
+![](figures/unnamed-chunk-142-1.png)<!-- -->
 
 ```r
 difindif_cont3_het <- difindifsims_res_het %>% 
@@ -5192,7 +3724,7 @@ difindif_cont3_het <- difindifsims_res_het %>%
 difindif_cont3_het
 ```
 
-![](figures/unnamed-chunk-80-2.png)<!-- -->
+![](figures/unnamed-chunk-142-2.png)<!-- -->
 
 ```r
 ggsave(difindif_cont3_hom, height=5, width=10, filename = "figures/Difindif_hom_contour.png")

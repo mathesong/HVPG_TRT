@@ -1,18 +1,16 @@
 ---
 title: "HVPG TRT and Power Analysis"
+always_allow_html: true
 output:
-  pdf_document:
-    toc: yes
-    keep_tex: yes
   html_document:
     df_print: paged
     keep_md: yes
-    always_allow_html: true
     toc: yes
     toc_float:
       toc_collapsed: yes
-  word_document:
+  pdf_document:
     toc: yes
+    keep_tex: yes
 ---
 
 # Aims
@@ -42,6 +40,7 @@ library(psych)
 library(permuco)
 library(metafor)
 library(viridis)
+library(pwr)
 
 extrafont::loadfonts(quiet = T)
 
@@ -1435,6 +1434,8 @@ So, for a true effect of about 2mmHg in compensated patients, it will appear as 
 
 ## Simulation
 
+Note: these are no longer run as we instead make use of the analytical solutions
+
 ```{r}
 HVPG_dif_sim <- function(n, delta, cv_delta, wscv=trt_all$wscv, 
                      mean=trt_all$mean, cv=trt_all$cv, icc=trt_all$icc,
@@ -1580,7 +1581,7 @@ difsims_res <- bind_rows(difsims_comp_res, difsims_decomp_res)
 
 ## Plotting
 
-```{r, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+```{r, fig.height=6, fig.width=7, message=FALSE, warning=FALSE, eval=FALSE}
 ggplot(difsims_res, aes(x=n, y=power, colour=delta)) +
   geom_point() + 
   geom_line() +
@@ -1597,7 +1598,7 @@ ggplot(difsims_res, aes(x=n, y=power, colour=delta)) +
 
 And how many people do we need for each scenario?
 
-```{r}
+```{r, eval=TRUE}
 difsims_80power <- difsims_res %>% 
   arrange(power) %>% 
   filter(power > 0.8) %>% 
@@ -1627,52 +1628,15 @@ decomp_change <- head(
     difsims_power$Patients ==
       trt_all$decomp[2]), 1)
 
-kable(difsims_power[,-1]) %>% 
-  kable_styling("striped", full_width = F) %>%
-  pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
-  pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_80power))
+# kable(difsims_power[,-1]) %>% 
+#   kable_styling("striped", full_width = F) %>%
+#   pack_rows(trt_all$decomp[1], 1, decomp_change-1) %>%
+#   pack_rows(trt_all$decomp[2], decomp_change, nrow(difsims_80power))
 ```
 
 
 ## Analytical solution
 
-Let's compare these with the analytical solution
-
-* Decomp
-* Homogeneous
-* 1.5
-
-* Expect: 20 < n < 25
-
-
-```{r}
-library(pwr)
-
-dz <- 1.5/(trt_all$signvar_sd[1]*trt_all$mean[1])
-
-pwr::pwr.t.test(d=dz, sig.level = 0.05, power = 0.8, 
-                type = "paired", alternative = "greater")
-```
-
-And hetero
-
-* Decomp
-* Homogeneous
-* 1.5
-
-* Expect: 25 < n < 30
-
-```{r}
-signvar_sd <- sqrt(
-    (trt_all$signvar_sd[1]*trt_all$mean[1])^2 +
-    (0.5*1.5)^2)
-  
-
-dz <- 1.5/signvar_sd
-
-pwr::pwr.t.test(d=dz, sig.level = 0.05, power = 0.8, 
-                type = "paired", alternative = "greater")
-```
 
 ```{r}
 difsims_ana <- function(Patients, Difference, Effects, Power,

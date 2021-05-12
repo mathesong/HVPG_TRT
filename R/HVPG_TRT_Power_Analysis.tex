@@ -98,20 +98,6 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{array}
-\usepackage{multirow}
-\usepackage{wrapfig}
-\usepackage{float}
-\usepackage{colortbl}
-\usepackage{pdflscape}
-\usepackage{tabu}
-\usepackage{threeparttable}
-\usepackage{threeparttablex}
-\usepackage[normalem]{ulem}
-\usepackage{makecell}
-\usepackage{xcolor}
 \ifluatex
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -159,6 +145,7 @@ treatments.
 \FunctionTok{library}\NormalTok{(permuco)}
 \FunctionTok{library}\NormalTok{(metafor)}
 \FunctionTok{library}\NormalTok{(viridis)}
+\FunctionTok{library}\NormalTok{(pwr)}
 
 \NormalTok{extrafont}\SpecialCharTok{::}\FunctionTok{loadfonts}\NormalTok{(}\AttributeTok{quiet =}\NormalTok{ T)}
 
@@ -259,11 +246,10 @@ divide by whether the study contains decompensated patients.
 \begin{verbatim}
 ## # A tibble: 2 x 14
 ## # Groups:   decomp [2]
-##   decomp   mean    sd    cv  skew kurtosis   icc icc_l icc_u   wscv   sdd absvar
-##   <chr>   <dbl> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl>
-## 1 Includ~  17.3  4.83 0.279 0.163   -0.610 0.852 0.813 0.883 0.107   5.16  0.107
-## 2 Only C~  16.4  3.83 0.233 0.339   -0.394 0.837 0.784 0.877 0.0945  4.29  0.108
-## # ... with 2 more variables: signvar <dbl>, signvar_sd <dbl>
+##   decomp                  mean    sd    cv  skew kurtosis   icc icc_l icc_u   wscv   sdd absvar signvar signvar_sd
+##   <chr>                  <dbl> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl>   <dbl>      <dbl>
+## 1 Includes Decompensated  17.3  4.83 0.279 0.163   -0.610 0.852 0.813 0.883 0.107   5.16  0.107 -0.0115      0.152
+## 2 Only Compensated        16.4  3.83 0.233 0.339   -0.394 0.837 0.784 0.877 0.0945  4.29  0.108  0.0135      0.133
 \end{verbatim}
 
 \begin{Shaded}
@@ -482,13 +468,10 @@ Now, let's prepare this as a table for below the forest plot
 
 \begin{verbatim}
 ## # A tibble: 2 x 22
-##   Study    mean    sd    cv  skew kurtosis   icc icc_l icc_u   wscv   sdd absvar
-##   <chr>   <dbl> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl>
-## 1 Only C~  16.4  3.83 0.233 0.339   -0.394 0.837 0.784 0.877 0.0945  4.29  0.108
-## 2 Includ~  17.3  4.83 0.279 0.163   -0.610 0.852 0.813 0.883 0.107   5.16  0.107
-## # ... with 10 more variables: signvar <dbl>, signvar_sd <dbl>, sdd_l <dbl>,
-## #   sdd_u <dbl>, sddm <dbl>, sddm_l <dbl>, sddm_u <dbl>, decomp <chr>,
-## #   Catheter <chr>, n <dbl>
+##   Study                    mean    sd    cv  skew kurtosis   icc icc_l icc_u   wscv   sdd absvar signvar signvar_sd sdd_l sdd_u  sddm sddm_l sddm_u decomp  Catheter        n
+##   <chr>                   <dbl> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl>   <dbl>      <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl> <chr>   <chr>       <dbl>
+## 1 Only Compensated         16.4  3.83 0.233 0.339   -0.394 0.837 0.784 0.877 0.0945  4.29  0.108  0.0135      0.133  3.80  4.93  26.2   22.9   30.0 Overall Balloon tip   230
+## 2 Includes Decompensated*  17.3  4.83 0.279 0.163   -0.610 0.852 0.813 0.883 0.107   5.16  0.107 -0.0115      0.152  4.66  5.78  29.8   26.6   33.4 Overall Balloon tip   332
 \end{verbatim}
 
 \hypertarget{grouped-by-study}{%
@@ -737,7 +720,7 @@ assess the heterogeneity.
 ## H^2 (total variability / sampling variability):  5.43
 ## 
 ## Test for Heterogeneity:
-## Q(df = 19) = 91.7983, p-val < .0001
+## Q(df = 19) = 91.7982, p-val < .0001
 ## 
 ## Model Results:
 ## 
@@ -1391,7 +1374,7 @@ And let's get some values for that too
 ## group: Includes Decompensated
 ##    vars   n mean   sd median trimmed  mad min  max range skew kurtosis   se
 ## X1    1 166 1.79 1.94      1    1.46 1.11   0 13.5  13.5 2.45     8.89 0.15
-## ------------------------------------------------------------ 
+## -------------------------------------------------------------------------------------------------------------------------------------------------- 
 ## group: Only Compensated
 ##    vars   n mean   sd median trimmed  mad min max range skew kurtosis   se
 ## X1    1 115 1.67 1.42      1    1.56 1.48   0   6     6 0.57    -0.64 0.13
@@ -1431,8 +1414,7 @@ For signed differences, let's assess whether they differ from zero.
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ 1 + (1 | Study)
 ##    Data: trt_wide
 ## 
@@ -1460,8 +1442,7 @@ For signed differences, let's assess whether they differ from zero.
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ 1 + (1 | Study)
 ##    Data: trt_wide_c
 ## 
@@ -1489,8 +1470,7 @@ For signed differences, let's assess whether they differ from zero.
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ 1 + (1 | Study)
 ##    Data: trt_wide_dc
 ## 
@@ -1539,7 +1519,7 @@ And some values
 ## group: Includes Decompensated
 ##    vars   n mean   sd median trimmed  mad   min max range  skew kurtosis  se
 ## X1    1 166 -0.2 2.63      0    -0.1 1.48 -13.5   9  22.5 -0.75     4.57 0.2
-## ------------------------------------------------------------ 
+## -------------------------------------------------------------------------------------------------------------------------------------------------- 
 ## group: Only Compensated
 ##    vars   n mean   sd median trimmed  mad  min max range skew kurtosis  se
 ## X1    1 115 0.22 2.19      0    0.22 1.48 -4.5   6  10.5 0.08     -0.4 0.2
@@ -1627,12 +1607,9 @@ Let's make some combined figures for the paper
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
-## (Intercept) 1.499246   0.153912   9.741           1.725e-19                   
-## Perc_Decomp 0.005031   0.002367   2.126           3.439e-02             0.9812
-##             permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                        
-## Perc_Decomp              0.019               0.0362
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept) 1.499246   0.153912   9.741           1.725e-19                                                           
+## Perc_Decomp 0.005031   0.002367   2.126           3.439e-02             0.9812              0.019               0.0362
 \end{verbatim}
 
 \begin{Shaded}
@@ -1664,14 +1641,10 @@ Let's make some combined figures for the paper
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##               Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)  1.6031874  0.1994382  8.0385           2.624e-14
-## Days        -0.0006133  0.0007477 -0.8202           4.128e-01
-## Perc_Decomp  0.0041622  0.0025941  1.6045           1.097e-01
-##             permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                           
-## Days                    0.2076             0.7926               0.3990
-## Perc_Decomp             0.9524             0.0478               0.1026
+##               Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)  1.6031874  0.1994382  8.0385           2.624e-14                                                           
+## Days        -0.0006133  0.0007477 -0.8202           4.128e-01             0.2076             0.7926               0.3990
+## Perc_Decomp  0.0041622  0.0025941  1.6045           1.097e-01             0.9524             0.0478               0.1026
 \end{verbatim}
 
 Now let's plot, after correcting for the effect of the patient groups.
@@ -1721,14 +1694,10 @@ Now let's plot, after correcting for the effect of the patient groups.
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
-## (Intercept)  1.94758   0.166155  11.721           4.711e-26                   
-## Perc_Alc    -0.02579   0.004560  -5.655           3.869e-08              2e-04
-## Perc_Decomp  0.01881   0.003313   5.677           3.447e-08              1e+00
-##             permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                        
-## Perc_Alc                 1e+00                2e-04
-## Perc_Decomp              2e-04                2e-04
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)  1.94758   0.166155  11.721           4.711e-26                                                           
+## Perc_Alc    -0.02579   0.004560  -5.655           3.869e-08              2e-04              1e+00                2e-04
+## Perc_Decomp  0.01881   0.003313   5.677           3.447e-08              1e+00              2e-04                2e-04
 \end{verbatim}
 
 \begin{Shaded}
@@ -1806,14 +1775,10 @@ Now let's plot, after correcting for the effect of the patient groups.
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                      Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)          1.663139   0.165791  10.032           2.056e-20
-## CentreSingle-centre -0.544349   0.216320  -2.516           1.242e-02
-## Perc_Decomp          0.007055   0.002478   2.846           4.750e-03
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## CentreSingle-centre             0.0062              0.994               0.0136
-## Perc_Decomp                     0.9982              0.002               0.0040
+##                      Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          1.663139   0.165791  10.032           2.056e-20                                                           
+## CentreSingle-centre -0.544349   0.216320  -2.516           1.242e-02             0.0062              0.994               0.0136
+## Perc_Decomp          0.007055   0.002478   2.846           4.750e-03             0.9982              0.002               0.0040
 \end{verbatim}
 
 \begin{Shaded}
@@ -1844,16 +1809,11 @@ Now let's plot, after correcting for the effect of the patient groups.
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                     Estimate Std. Error  t value parametric Pr(>|t|)
-## (Intercept)          1.94534   0.168789 11.52527           2.287e-25
-## Perc_Decomp          0.01884   0.003349  5.62673           4.493e-08
-## CentreSingle-centre  0.01892   0.236163  0.08012           9.362e-01
-## Perc_Alc            -0.02599   0.005198 -4.99906           1.023e-06
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## Perc_Decomp                     1.0000             0.0002               0.0002
-## CentreSingle-centre             0.5338             0.4664               0.9270
-## Perc_Alc                        0.0002             1.0000               0.0002
+##                     Estimate Std. Error  t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          1.94534   0.168789 11.52527           2.287e-25                                                           
+## Perc_Decomp          0.01884   0.003349  5.62673           4.493e-08             1.0000             0.0002               0.0002
+## CentreSingle-centre  0.01892   0.236163  0.08012           9.362e-01             0.5338             0.4664               0.9270
+## Perc_Alc            -0.02599   0.005198 -4.99906           1.023e-06             0.0002             1.0000               0.0002
 \end{verbatim}
 
 \begin{Shaded}
@@ -1865,14 +1825,10 @@ Now let's plot, after correcting for the effect of the patient groups.
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                     Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)          1.99513   0.170383  11.710           3.636e-21
-## CentreSingle-centre -0.38265   0.310236  -1.233           2.200e-01
-## Perc_Alc            -0.01289   0.007501  -1.718           8.858e-02
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## CentreSingle-centre             0.1070             0.8932               0.2218
-## Perc_Alc                        0.0474             0.9528               0.0924
+##                     Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          1.99513   0.170383  11.710           3.636e-21                                                           
+## CentreSingle-centre -0.38265   0.310236  -1.233           2.200e-01             0.1070             0.8932               0.2218
+## Perc_Alc            -0.01289   0.007501  -1.718           8.858e-02             0.0474             0.9528               0.0924
 \end{verbatim}
 
 \begin{Shaded}
@@ -1884,14 +1840,10 @@ Now let's plot, after correcting for the effect of the patient groups.
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                     Estimate Std. Error t value parametric Pr(>|t|)
-## (Intercept)          2.99299   0.440666   6.792           1.967e-10
-## CentreSingle-centre  0.37572   0.372646   1.008           3.148e-01
-## Perc_Alc            -0.02274   0.008097  -2.808           5.587e-03
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## CentreSingle-centre             0.8450             0.1552               0.3112
-## Perc_Alc                        0.0066             0.9936               0.0078
+##                     Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          2.99299   0.440666   6.792           1.967e-10                                                           
+## CentreSingle-centre  0.37572   0.372646   1.008           3.148e-01             0.8450             0.1552               0.3112
+## Perc_Alc            -0.02274   0.008097  -2.808           5.587e-03             0.0066             0.9936               0.0078
 \end{verbatim}
 
 Let's examine why this might be.
@@ -1984,18 +1936,12 @@ confounding factors.
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##                       Estimate Std. Error  t value parametric Pr(>|t|)
-## (Intercept)          2.0833441  0.2090856  9.96407           3.545e-20
-## Perc_Decomp          0.0178489  0.0034640  5.15263           4.898e-07
-## CentreSingle-centre  0.0234628  0.2360917  0.09938           9.209e-01
-## Perc_Alc            -0.0262613  0.0052018 -5.04852           8.097e-07
-## Days                -0.0007942  0.0007107 -1.11745           2.648e-01
-##                     permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                                                   
-## Perc_Decomp                     1.0000             0.0002               0.0002
-## CentreSingle-centre             0.5348             0.4654               0.9186
-## Perc_Alc                        0.0002             1.0000               0.0002
-## Days                            0.1308             0.8694               0.2550
+##                       Estimate Std. Error  t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept)          2.0833441  0.2090856  9.96407           3.545e-20                                                           
+## Perc_Decomp          0.0178489  0.0034640  5.15263           4.898e-07             1.0000             0.0002               0.0002
+## CentreSingle-centre  0.0234628  0.2360917  0.09938           9.209e-01             0.5348             0.4654               0.9186
+## Perc_Alc            -0.0262613  0.0052018 -5.04852           8.097e-07             0.0002             1.0000               0.0002
+## Days                -0.0007942  0.0007107 -1.11745           2.648e-01             0.1308             0.8694               0.2550
 \end{verbatim}
 
 This does not appear to be the case!
@@ -2015,14 +1961,10 @@ This does not appear to be the case!
 \begin{verbatim}
 ## Table of marginal t-test of the betas
 ## Permutation test using freedman_lane to handle nuisance variables and 5000 permutations.
-##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t)
-## (Intercept) 1.085870   0.422931   2.567             0.01077                   
-## meanval     0.025623   0.024418   1.049             0.29494             0.8470
-## Perc_Decomp 0.004602   0.002401   1.917             0.05630             0.9774
-##             permutation Pr(>t) permutation Pr(>|t|)
-## (Intercept)                                        
-## meanval                 0.1532                0.299
-## Perc_Decomp             0.0228                0.054
+##             Estimate Std. Error t value parametric Pr(>|t|) permutation Pr(<t) permutation Pr(>t) permutation Pr(>|t|)
+## (Intercept) 1.085870   0.422931   2.567             0.01077                                                           
+## meanval     0.025623   0.024418   1.049             0.29494             0.8470             0.1532                0.299
+## Perc_Decomp 0.004602   0.002401   1.917             0.05630             0.9774             0.0228                0.054
 \end{verbatim}
 
 \begin{Shaded}
@@ -2099,8 +2041,7 @@ This does not appear to be the case!
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + Perc_Decomp + (1 | Study)
 ##    Data: trt_wide
 ## 
@@ -2138,8 +2079,7 @@ This does not appear to be the case!
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + (1 | Study)
 ##    Data: trt_wide
 ## 
@@ -2175,8 +2115,7 @@ This does not appear to be the case!
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + (1 | Study)
 ##    Data: trt_wide_c
 ## 
@@ -2212,8 +2151,7 @@ This does not appear to be the case!
 \end{Shaded}
 
 \begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
+## Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
 ## Formula: change ~ meanval + (1 | Study)
 ##    Data: trt_wide_dc
 ## 
@@ -2775,6 +2713,9 @@ experience.
 \hypertarget{simulation}{%
 \subsection{Simulation}\label{simulation}}
 
+Note: these are no longer run as we instead make use of the analytical
+solutions
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{HVPG\_dif\_sim }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n, delta, cv\_delta, }\AttributeTok{wscv=}\NormalTok{trt\_all}\SpecialCharTok{$}\NormalTok{wscv, }
@@ -2944,8 +2885,6 @@ And extract the results
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-61-1.png}
-
 \hypertarget{required-individuals}{%
 \subsection{Required Individuals}\label{required-individuals}}
 
@@ -2982,145 +2921,15 @@ And how many people do we need for each scenario?
 \NormalTok{    difsims\_power}\SpecialCharTok{$}\NormalTok{Patients }\SpecialCharTok{==}
 \NormalTok{      trt\_all}\SpecialCharTok{$}\NormalTok{decomp[}\DecValTok{2}\NormalTok{]), }\DecValTok{1}\NormalTok{)}
 
-\FunctionTok{kable}\NormalTok{(difsims\_power[,}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]) }\SpecialCharTok{\%\textgreater{}\%} 
-  \FunctionTok{kable\_styling}\NormalTok{(}\StringTok{"striped"}\NormalTok{, }\AttributeTok{full\_width =}\NormalTok{ F) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pack\_rows}\NormalTok{(trt\_all}\SpecialCharTok{$}\NormalTok{decomp[}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{, decomp\_change}\DecValTok{{-}1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pack\_rows}\NormalTok{(trt\_all}\SpecialCharTok{$}\NormalTok{decomp[}\DecValTok{2}\NormalTok{], decomp\_change, }\FunctionTok{nrow}\NormalTok{(difsims\_80power))}
+\CommentTok{\# kable(difsims\_power[,{-}1]) \%\textgreater{}\% }
+\CommentTok{\#   kable\_styling("striped", full\_width = F) \%\textgreater{}\%}
+\CommentTok{\#   pack\_rows(trt\_all$decomp[1], 1, decomp\_change{-}1) \%\textgreater{}\%}
+\CommentTok{\#   pack\_rows(trt\_all$decomp[2], decomp\_change, nrow(difsims\_80power))}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{l|l|r|r}
-\hline
-Difference (mmHg) & Effects & 80\% Power & 90\% Power\\
-\hline
-\multicolumn{4}{l}{\textbf{Includes Decompensated}}\\
-\hline
-\hspace{1em}1 & Homogeneous Effects & 55 & 75\\
-\hline
-\hspace{1em}1 & Heterogeneous Effects & 60 & 80\\
-\hline
-\hspace{1em}1.5 & Homogeneous Effects & 25 & 35\\
-\hline
-\hspace{1em}1.5 & Heterogeneous Effects & 30 & 40\\
-\hline
-\hspace{1em}2 & Homogeneous Effects & 15 & 20\\
-\hline
-\hspace{1em}2 & Heterogeneous Effects & 20 & 25\\
-\hline
-\hspace{1em}2.5 & Homogeneous Effects & 10 & 15\\
-\hline
-\hspace{1em}2.5 & Heterogeneous Effects & 15 & 20\\
-\hline
-\hspace{1em}3 & Homogeneous Effects & 10 & 10\\
-\hline
-\hspace{1em}3 & Heterogeneous Effects & 10 & 15\\
-\hline
-\multicolumn{4}{l}{\textbf{Only Compensated}}\\
-\hline
-\hspace{1em}1 & Homogeneous Effects & 30 & 40\\
-\hline
-\hspace{1em}1 & Heterogeneous Effects & 30 & 40\\
-\hline
-\hspace{1em}1.5 & Homogeneous Effects & 15 & 20\\
-\hline
-\hspace{1em}1.5 & Heterogeneous Effects & 15 & 20\\
-\hline
-\hspace{1em}2 & Homogeneous Effects & 10 & 15\\
-\hline
-\hspace{1em}2 & Heterogeneous Effects & 10 & 15\\
-\hline
-\hspace{1em}2.5 & Homogeneous Effects & 10 & 10\\
-\hline
-\hspace{1em}2.5 & Heterogeneous Effects & 10 & 10\\
-\hline
-\hspace{1em}3 & Homogeneous Effects & 5 & 10\\
-\hline
-\hspace{1em}3 & Heterogeneous Effects & 10 & 10\\
-\hline
-\end{tabular}
-\end{table}
 
 \hypertarget{analytical-solution}{%
 \subsection{Analytical solution}\label{analytical-solution}}
-
-Let's compare these with the analytical solution
-
-\begin{itemize}
-\item
-  Decomp
-\item
-  Homogeneous
-\item
-  1.5
-\item
-  Expect: 20 \textless{} n \textless{} 25
-\end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(pwr)}
-
-\NormalTok{dz }\OtherTok{\textless{}{-}} \FloatTok{1.5}\SpecialCharTok{/}\NormalTok{(trt\_all}\SpecialCharTok{$}\NormalTok{signvar\_sd[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\NormalTok{trt\_all}\SpecialCharTok{$}\NormalTok{mean[}\DecValTok{1}\NormalTok{])}
-
-\NormalTok{pwr}\SpecialCharTok{::}\FunctionTok{pwr.t.test}\NormalTok{(}\AttributeTok{d=}\NormalTok{dz, }\AttributeTok{sig.level =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{power =} \FloatTok{0.8}\NormalTok{, }
-                \AttributeTok{type =} \StringTok{"paired"}\NormalTok{, }\AttributeTok{alternative =} \StringTok{"greater"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## 
-##      Paired t test power calculation 
-## 
-##               n = 20.45661
-##               d = 0.5699301
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = greater
-## 
-## NOTE: n is number of *pairs*
-\end{verbatim}
-
-And hetero
-
-\begin{itemize}
-\item
-  Decomp
-\item
-  Homogeneous
-\item
-  1.5
-\item
-  Expect: 25 \textless{} n \textless{} 30
-\end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{signvar\_sd }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}
-\NormalTok{    (trt\_all}\SpecialCharTok{$}\NormalTok{signvar\_sd[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{*}\NormalTok{trt\_all}\SpecialCharTok{$}\NormalTok{mean[}\DecValTok{1}\NormalTok{])}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}
-\NormalTok{    (}\FloatTok{0.5}\SpecialCharTok{*}\FloatTok{1.5}\NormalTok{)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
-  
-
-\NormalTok{dz }\OtherTok{\textless{}{-}} \FloatTok{1.5}\SpecialCharTok{/}\NormalTok{signvar\_sd}
-
-\NormalTok{pwr}\SpecialCharTok{::}\FunctionTok{pwr.t.test}\NormalTok{(}\AttributeTok{d=}\NormalTok{dz, }\AttributeTok{sig.level =} \FloatTok{0.05}\NormalTok{, }\AttributeTok{power =} \FloatTok{0.8}\NormalTok{, }
-                \AttributeTok{type =} \StringTok{"paired"}\NormalTok{, }\AttributeTok{alternative =} \StringTok{"greater"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## 
-##      Paired t test power calculation 
-## 
-##               n = 21.99721
-##               d = 0.5481097
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = greater
-## 
-## NOTE: n is number of *pairs*
-\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3386,7 +3195,7 @@ Run it
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-68-1.png}
+\includegraphics{figures/unnamed-chunk-66-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3394,7 +3203,7 @@ Run it
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-68-2.png}
+\includegraphics{figures/unnamed-chunk-66-2.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3702,7 +3511,7 @@ Here we have the size of the effect of the better intervention as the
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-76-1.png}
+\includegraphics{figures/unnamed-chunk-74-1.png}
 
 \hypertarget{required-individuals-1}{%
 \subsection{Required Individuals}\label{required-individuals-1}}
@@ -4103,7 +3912,7 @@ First let's look at different deltadif values.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-78-1.png}
+\includegraphics{figures/unnamed-chunk-76-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4124,7 +3933,7 @@ First let's look at different deltadif values.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-78-2.png} This is helpful to
+\includegraphics{figures/unnamed-chunk-76-2.png} This is helpful to
 visualise, though probably not for the paper. With homogeneous effects,
 the determinant of the power is the difference in intervention effects;
 it's a straight line. With heterogeneous effects, the line is not
@@ -4147,7 +3956,7 @@ straight
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-79-1.png}
+\includegraphics{figures/unnamed-chunk-77-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4166,7 +3975,7 @@ straight
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-79-2.png}
+\includegraphics{figures/unnamed-chunk-77-2.png}
 
 And just looking against placebo (i.e.~delta2=0)
 
@@ -4190,7 +3999,7 @@ And just looking against placebo (i.e.~delta2=0)
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-80-1.png}
+\includegraphics{figures/unnamed-chunk-78-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4212,7 +4021,7 @@ And just looking against placebo (i.e.~delta2=0)
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{figures/unnamed-chunk-80-2.png}
+\includegraphics{figures/unnamed-chunk-78-2.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]

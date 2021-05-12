@@ -1,0 +1,45 @@
+\contentsline {section}{Aims}{2}{section*.2}%
+\contentsline {section}{Libraries}{2}{section*.3}%
+\contentsline {section}{Data}{3}{section*.4}%
+\contentsline {section}{Study Names}{3}{section*.5}%
+\contentsline {section}{Test-Retest Analysis}{3}{section*.6}%
+\contentsline {subsection}{As if one study}{3}{section*.7}%
+\contentsline {subsection}{Grouped by study}{7}{section*.8}%
+\contentsline {subsubsection}{ICC}{9}{section*.9}%
+\contentsline {subsubsection}{SDD}{11}{section*.10}%
+\contentsline {paragraph}{Absolute}{11}{section*.11}%
+\contentsline {paragraph}{Percentage}{14}{section*.12}%
+\contentsline {subsubsection}{Figures together}{17}{section*.13}%
+\contentsline {subsubsection}{Just ICC and SDD}{19}{section*.14}%
+\contentsline {subsection}{Are they different}{20}{section*.15}%
+\contentsline {subsubsection}{ICC}{20}{section*.16}%
+\contentsline {subsubsection}{SDD}{22}{section*.17}%
+\contentsline {subsubsection}{SDDM}{23}{section*.18}%
+\contentsline {section}{Causes of differences}{25}{section*.19}%
+\contentsline {subsection}{Skewness}{25}{section*.20}%
+\contentsline {subsubsection}{Absolute}{25}{section*.21}%
+\contentsline {subsubsection}{Signed}{28}{section*.22}%
+\contentsline {subsubsection}{Figures}{31}{section*.23}%
+\contentsline {subsection}{Percentage Decomp}{33}{section*.24}%
+\contentsline {subsection}{Days elapsed}{34}{section*.25}%
+\contentsline {subsection}{Percentage Alcoholic}{35}{section*.26}%
+\contentsline {subsection}{Multicentre}{37}{section*.27}%
+\contentsline {subsection}{Combined Model}{38}{section*.28}%
+\contentsline {subsubsection}{Days}{41}{section*.29}%
+\contentsline {subsection}{Mean Value}{41}{section*.30}%
+\contentsline {subsubsection}{Absolute}{41}{section*.31}%
+\contentsline {subsubsection}{Signed}{43}{section*.32}%
+\contentsline {subsection}{Figures}{47}{section*.33}%
+\contentsline {section}{Power Analysis for a difference}{49}{section*.34}%
+\contentsline {subsection}{True and Apparent Changes}{54}{section*.35}%
+\contentsline {subsection}{Simulation}{56}{section*.36}%
+\contentsline {subsection}{Plotting}{59}{section*.37}%
+\contentsline {subsection}{Required Individuals}{59}{section*.38}%
+\contentsline {subsection}{Analytical solution}{60}{section*.39}%
+\contentsline {subsubsection}{Contour Plots}{61}{section*.40}%
+\contentsline {section}{Power Analysis for Difference in Differences}{63}{section*.41}%
+\contentsline {subsection}{Simulation}{63}{section*.42}%
+\contentsline {subsection}{Plotting}{67}{section*.43}%
+\contentsline {subsection}{Required Individuals}{69}{section*.44}%
+\contentsline {subsection}{Contour Plot}{70}{section*.45}%
+\contentsline {section}{ICC Figures}{79}{section*.46}%
