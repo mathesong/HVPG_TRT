@@ -331,6 +331,8 @@ overall
 
 
 
+
+
 ## Grouped by study
 
 
@@ -1315,6 +1317,7 @@ And some values
 ```r
 psych::describe(trt_wide$change)
 ```
+
 
 
 ```r
