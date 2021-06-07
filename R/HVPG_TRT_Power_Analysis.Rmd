@@ -129,7 +129,7 @@ trt_all
 
 saveRDS(trt_all, "../Cluster/trt_all.rds")
 
-kable(trt_all, digits=2)
+kable(trt_all, digits=2, format="markdown")
 ```
 
 I'll also create a tidy version of this to complement the individual studies.
@@ -145,12 +145,14 @@ trt_all_tidy <- trt_all %>%
          "Change SD" = signvar_sd) %>% 
   arrange(desc(Patients))
 
-kable(trt_all_tidy, digits=2)
+kable(trt_all_tidy, digits=2, format="markdown")
 ```
 
 
 
 So, overall, we estimate that our smallest detectable difference in an individual is `r round(trt_all$sdd, 1)[2]`mmHg for only compensated patients, and `r round(trt_all$sdd, 1)[1]`mmHg for studies including decompensated patients
+
+Comparing the variances between groups, the Decompensated group has a true variance which is `r round((((trt_all$sd[1])^2 / (trt_all$sd[2])^2) - 1)*100, 1)`% larger than the Compensated group, and an error variance which is `r round((((trt_all$wscv[1]*trt_all$mean[1])^2 / (trt_all$wscv[2]*trt_all$mean[2])^2) - 1)*100, 1)`% larger.
 
 ```{r}
 trt_all_detailed <- trt_tidy %>% 
@@ -245,7 +247,7 @@ tidytrt <- map_df(trt_study$outcomes, 'tidy') %>%
   select(-n_Patients)
 
 
-knitr::kable(tidytrt, digits = 2)
+knitr::kable(tidytrt, digits = 2, format="markdown")
 ```
 
 

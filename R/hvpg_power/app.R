@@ -74,7 +74,7 @@ ui <- fluidPage(
                            selected = "False"),
                selectInput("control_effect",
                            "Control Intervention Effect:",
-                           choices = c("Placebo" = 0, 
+                           choices = c("0 mmHg" = 0, 
                                        "0.5 mmHg" = 0.5,
                                        "1 mmHg" = 1,
                                        "1.5 mmHg" = 1.5,
