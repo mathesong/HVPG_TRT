@@ -1,17 +1,4 @@
----
-title: "HVPG TRT and Power Analysis"
-always_allow_html: true
-output:
-  html_document:
-    df_print: paged
-    keep_md: yes
-    toc: yes
-    toc_float:
-      toc_collapsed: yes
-  pdf_document:
-    toc: yes
-    keep_tex: yes
----
+# HVPG TRT and Power Analysis
 
 # Aims
 
